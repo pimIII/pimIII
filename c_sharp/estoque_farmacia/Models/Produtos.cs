@@ -1,0 +1,1 @@
+namespace estoque_farmacia.Models;
