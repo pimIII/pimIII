@@ -1,0 +1,1 @@
+//Fornecedor.cs: Id, NomeEmpresa, CNPJ, Telefone.

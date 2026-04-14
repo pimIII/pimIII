@@ -1,0 +1,1 @@
+//Lote.cs: Id, IdProduto, NumeroLote, DataValidade, Quantidade.
