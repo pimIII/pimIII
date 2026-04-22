@@ -6,9 +6,9 @@ Repositório central para o desenvolvimento do sistema de estoque de farmácia (
 
 ## 📂 Estrutura do Projeto
 
-- **/c_sharp**: Contém a solução Back-end e lógica do sistema em C#.
-- **/database**: Contém os scripts SQL para criação e manutenção do banco de dados.
-- **/docs**: Documentação do projeto, protótipos de UI/UX e requisitos.
+- **/backend**: Contém a solução Back-end, lógica do sistema em C# e os scripts SQL para criação e manutenção do banco de dados.
+- **/frontend**: Contém toda a estrutura visual do projeto, protótipos de UI/UX e front com HTML-CSS.
+- **/docs**: Documentação do projeto e requisitos.
 
 ---
 
