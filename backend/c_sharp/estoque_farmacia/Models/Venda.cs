@@ -11,5 +11,6 @@
 // DECIMAL(10,2)
 // forma_pagamento
 // VARCHAR(30)
+//preco venda
 
 
