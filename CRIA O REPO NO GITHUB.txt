@@ -1,4 +1,4 @@
-CRIA O REPO NO GITHUB
+CRIA O REPO NO GITHUB!
 https://github.com/andersonraujjo/html_lab.git
 ------------------------------------------------------------------
 DA O CD PASTA NO CMD
