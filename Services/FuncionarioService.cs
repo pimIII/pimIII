@@ -103,7 +103,8 @@ namespace Domain.Services
             if (!string.IsNullOrWhiteSpace(nome))
             {
                 var pattern = $"%{nome}%";
-                query = query.Where(f => EF.Functions.ILike(f.Nome, pattern));
+                // ILike não está disponível em todas as provedoras; usar Contains como alternativa portável.
+                query = query.Where(f => EF.Functions.Like(f.Nome, pattern));
             }
 
             return await query.OrderBy(f => f.Nome)

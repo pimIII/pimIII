@@ -11,6 +11,10 @@ public class ProdutoUI
         _produtoService = produtoService;
     }
 
+    /// <summary>
+    /// Exibe o menu de operações relacionadas a produtos.
+    /// </summary>
+
 
 
     public void MostrarMenuProduto() {
@@ -28,6 +32,9 @@ public class ProdutoUI
         }
 
 
+    /// <summary>
+    /// Loop que processa as opções do menu de produto até o usuário retornar.
+    /// </summary>
     public void ProcessarMenuProduto()
     {
         bool continuar = true;
@@ -91,6 +98,9 @@ public class ProdutoUI
 
 
 
+    /// <summary>
+    /// Lê os dados do produto no console e registra um novo produto.
+    /// </summary>
     public void CadastrarProduto()
     {
         Console.Write("\n");
@@ -166,6 +176,9 @@ public class ProdutoUI
     }
 
 
+    /// <summary>
+    /// Solicita o ID do produto e tenta removê-lo da lista.
+    /// </summary>
     public void RemoverProduto()
     {
         Console.Write("Digite o ID do produto a ser removido: ");

@@ -1,15 +1,34 @@
 namespace estoque_farmacia.Models;
 
-//Produto.cs: Id, Nome, PrecoVenda, IdFornecedor.
-
-
+/// <summary>
+/// Representa um produto no estoque da farmácia.
+/// </summary>
 public class Produto
 {
-    public string NomeProduto {get;set;}
-    public decimal PrecoVenda {get;set;}
-    public decimal PrecoCusto {get;set;}
-    public int IdFornecedor {get;set;}
-    public bool RequerReceita {get;set;}
+    /// <summary>
+    /// Nome do produto.
+    /// </summary>
+    public string NomeProduto { get; set; }
+
+    /// <summary>
+    /// Preço de venda do produto.
+    /// </summary>
+    public decimal PrecoVenda { get; set; }
+
+    /// <summary>
+    /// Preço de custo do produto.
+    /// </summary>
+    public decimal PrecoCusto { get; set; }
+
+    /// <summary>
+    /// Identificador do fornecedor responsável por este produto.
+    /// </summary>
+    public int IdFornecedor { get; set; }
+
+    /// <summary>
+    /// Indica se o produto requer receita (prescrição médica).
+    /// </summary>
+    public bool RequerReceita { get; set; }
 
 }
 

@@ -1,0 +1,47 @@
+Classe Produto
+- NomeProduto: string
+- PrecoVenda: decimal
+- PrecoCusto: decimal
+- IdFornecedor: int
+- RequerReceita: bool
+
+Classe Fornecedor
+- NomeEmpresa: string
+- Cnpj: string
+- Telefone: string
+
+Classe Funcionario
+- Id: int
+- Nome: string
+- CPF: string
+- Cargo: string
+- Salario: decimal
+- DataAdmissao: DateTime
+
+Classe ProdutoService
++ Salvar(Produto)
++ ListarTodos(): List<Produto>
++ Remover(int): bool
+
+Classe FornecedorService
++ Salvar(Fornecedor)
++ ListarTodos(): List<Fornecedor>
++ Remover(int): bool
+
+Classe Menu
++ ValidarLogin(): bool
++ ProcessarMenu()
+
+Classe ProdutoUI
++ MostrarMenuProduto()
++ ProcessarMenuProduto()
++ CadastrarProduto()
++ RemoverProduto()
+
+Classe FornecedorUI
++ MostrarMenuFornecedor()
++ ProcessarMenuFornecedor()
++ ObterDadosFornecedor()
++ RemoverFornecedor()
+
+(representação textual gerada automaticamente)
