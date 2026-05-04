@@ -1,12 +1,24 @@
-//Fornecedor.cs: Id, NomeEmpresa, CNPJ, Telefone.
 namespace estoque_farmacia.Models;
 
-
+/// <summary>
+/// Representa um fornecedor de produtos para a farmácia.
+/// </summary>
 public class Fornecedor
 {
-    public string NomeEmpresa {get;set;}
-    public string Cnpj {get;set;}
-    public string Telefone {get;set;}
+    /// <summary>
+    /// Nome da empresa fornecedora.
+    /// </summary>
+    public string NomeEmpresa { get; set; }
+
+    /// <summary>
+    /// CNPJ da empresa fornecedora.
+    /// </summary>
+    public string Cnpj { get; set; }
+
+    /// <summary>
+    /// Telefone de contato do fornecedor.
+    /// </summary>
+    public string Telefone { get; set; }
 
 }
 

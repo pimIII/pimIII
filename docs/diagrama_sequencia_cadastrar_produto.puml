@@ -1,0 +1,15 @@
+@startuml
+actor "Usuário (Atendente)" as User
+participant "ProdutoUI" as UI
+participant "ProdutoService" as Service
+participant "Repositorio (memória)" as Repo
+
+User -> UI: Seleciona 'Cadastrar produto'
+UI -> UI: Solicita dados (nome, precoVenda, precoCusto, idFornecedor, requerReceita)
+User -> UI: Fornece dados
+UI -> Service: Salvar(novoProduto)
+Service -> Repo: Adicionar(novoProduto)
+Repo --> Service: Confirmação
+Service --> UI: Sucesso
+UI --> User: Exibe mensagem de sucesso
+@enduml

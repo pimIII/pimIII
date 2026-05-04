@@ -10,13 +10,21 @@ public class Menu{
     private readonly FornecedorUI _fornecedorUI;
     private readonly ProdutoUI _produtoUI;
 
-      public Menu()
+    /// <summary>
+    /// Inicializa uma nova instância do menu principal da aplicação,
+    /// conectando as UIs aos seus serviços correspondentes.
+    /// </summary>
+    public Menu()
     {
         _fornecedorUI = new FornecedorUI(_fornecedorService);
         _produtoUI = new ProdutoUI(_produtoService);
     }
 
     
+    /// <summary>
+    /// Solicita credenciais do usuário e valida um login simples.
+    /// Retorna true quando o usuário é autorizado.
+    /// </summary>
     public bool ValidarLogin(){
         Console.WriteLine("\n=== SISTEMA FARMÁCIA ===");
         Console.Write("\nDigite seu Login: ");
@@ -41,6 +49,9 @@ public class Menu{
 
     }
 
+    /// <summary>
+    /// Exibe as opções do menu principal no console.
+    /// </summary>
     public void MostrarMenu()
     {
         Console.Clear(); // limpa o console
@@ -53,6 +64,9 @@ public class Menu{
         Console.Write("\nOPÇÃO >>> ");
     }
 
+    /// <summary>
+    /// Loop principal que processa a opção selecionada pelo usuário até sair.
+    /// </summary>
     public void ProcessarMenu()
     {
         bool continuar = true;
