@@ -18,11 +18,7 @@ public class Menu
     
     public bool ValidarLogin()
     {
-        bool logado = false;
-        int tentativas = 0;
-        int maxTentativas = 3;
-
-        while (!logado && tentativas < maxTentativas)
+        while (true)
         {
             Console.Clear();
             Console.WriteLine("\n=== SISTEMA FARMÁCIA ===");
@@ -40,25 +36,11 @@ public class Menu
             }
             else
             {
-                tentativas++;
-                int tentativasRestantes = maxTentativas - tentativas;
-
-                if (tentativasRestantes > 0)
-                {
-                    Console.WriteLine($"\nUsuário ou senha incorretos. Tentativas restantes: {tentativasRestantes}");
-                    Console.WriteLine("Pressione ENTER para tentar novamente...");
-                    Console.ReadLine();
-                }
-                else
-                {
-                    Console.WriteLine("\nMáximo de tentativas atingido. Sistema será encerrado.");
-                    Thread.Sleep(2000);
-                    return false;
-                }
+                Console.WriteLine("\nUsuário ou senha incorretos.");
+                Console.WriteLine("Pressione ENTER para tentar novamente...");
+                Console.ReadLine();
             }
         }
-
-        return false;
     }
 
     /// <summary>
