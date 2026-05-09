@@ -7,8 +7,10 @@ public class Menu{
 
     private readonly FornecedorService _fornecedorService = new FornecedorService();
     private readonly ProdutoService _produtoService = new ProdutoService();
+    private readonly FuncionarioService _funcionarioService = new FuncionarioService();
     private readonly FornecedorUI _fornecedorUI;
     private readonly ProdutoUI _produtoUI;
+    private readonly FuncionarioUI _funcionarioUI;
 
     /// <summary>
     /// Inicializa uma nova instância do menu principal da aplicação,
@@ -18,6 +20,7 @@ public class Menu{
     {
         _fornecedorUI = new FornecedorUI(_fornecedorService);
         _produtoUI = new ProdutoUI(_produtoService);
+        _funcionarioUI = new FuncionarioUI(_funcionarioService);
     }
 
     
@@ -82,7 +85,7 @@ public class Menu{
                 break;
 
                 case "2":
-                //ControledeFuncionario;
+                _funcionarioUI.ProcessarMenuFuncionario();
                 break;
 
                 case "3":
