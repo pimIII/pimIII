@@ -23,7 +23,7 @@ Antes de começar, certifique-se de ter instalado:
 ### 1. Clonar o repositório
 
 ```bash
-git clone <url-do-repositorio>
+git clone https://github.com/pimIII/pimIII.git
 cd pimIII/backend/c_sharp/estoque_farmacia
 ```
 
