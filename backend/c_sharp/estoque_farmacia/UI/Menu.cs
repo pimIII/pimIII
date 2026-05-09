@@ -16,32 +16,49 @@ public class Menu
     }
 
     
-    /// <summary>
-    /// Solicita credenciais do usuário e valida um login simples.
-    /// Retorna true quando o usuário é autorizado.
-    /// </summary>
-    public bool ValidarLogin(){
-        Console.WriteLine("\n=== SISTEMA FARMÁCIA ===");
-        Console.Write("\nDigite seu Login: ");
-        string login = Console.ReadLine();
-        Console.Write("Digite sua senha: ");
-        string senha = Console.ReadLine();
+    public bool ValidarLogin()
+    {
+        bool logado = false;
+        int tentativas = 0;
+        int maxTentativas = 3;
 
-        if (login =="admin" && senha == "123")
+        while (!logado && tentativas < maxTentativas)
         {
-            Console.WriteLine("\n");
-            Console.WriteLine("Login realizado com sucesso.");
-            Thread.Sleep(1500);
             Console.Clear();
-            return true; // retorna true se o login bater
+            Console.WriteLine("\n=== SISTEMA FARMÁCIA ===");
+            Console.Write("\nDigite seu Login: ");
+            string login = Console.ReadLine();
+            Console.Write("Digite sua senha: ");
+            string senha = Console.ReadLine();
+
+            if (login == "admin" && senha == "123")
+            {
+                Console.WriteLine("\nLogin realizado com sucesso.");
+                Thread.Sleep(1500);
+                Console.Clear();
+                return true;
+            }
+            else
+            {
+                tentativas++;
+                int tentativasRestantes = maxTentativas - tentativas;
+
+                if (tentativasRestantes > 0)
+                {
+                    Console.WriteLine($"\nUsuário ou senha incorretos. Tentativas restantes: {tentativasRestantes}");
+                    Console.WriteLine("Pressione ENTER para tentar novamente...");
+                    Console.ReadLine();
+                }
+                else
+                {
+                    Console.WriteLine("\nMáximo de tentativas atingido. Sistema será encerrado.");
+                    Thread.Sleep(2000);
+                    return false;
+                }
+            }
         }
 
-        else
-        {
-        Console.WriteLine("Usuário ou senha incorretos.");
         return false;
-        }
-
     }
 
     /// <summary>
