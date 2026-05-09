@@ -1,54 +1,157 @@
-README TEMPORÁRIO.
+# Sistema de Estoque Farmácia
 
-# 💊 Sistema de Gerenciamento de Estoque - PIM III
+Sistema de gerenciamento de estoque para farmácia, desenvolvido em C# com .NET 10.0 e Entity Framework Core, utilizando SQL Server como banco de dados.
 
-Repositório central para o desenvolvimento do sistema de estoque de farmácia (CRUD).
+## Pré-requisitos
 
-## 📂 Estrutura do Projeto
+Antes de começar, certifique-se de ter instalado:
 
-- **/backend**: Contém a solução Back-end, lógica do sistema em C# e os scripts SQL para criação e manutenção do banco de dados.
-- **/frontend**: Contém toda a estrutura visual do projeto, protótipos de UI/UX e front com HTML-CSS.
-- **/docs**: Documentação do projeto e requisitos.
+- **.NET 10.0 SDK** ou superior
+  - Download: [https://dotnet.microsoft.com/download](https://dotnet.microsoft.com/download)
+  
+- **SQL Server Express** (ou versão completa do SQL Server)
+  - Download: [https://www.microsoft.com/pt-br/sql-server/sql-server-downloads](https://www.microsoft.com/pt-br/sql-server/sql-server-downloads)
+  - Durante a instalação, use a instância padrão: `SQLEXPRESS`
+  - Ative "Autenticação do Windows (Trusted Connection)"
 
----
+- **SQL Server Management Studio (SSMS)** - Opcional, mas recomendado
+  - Para gerenciar e visualizar o banco de dados
+  - Download: [https://docs.microsoft.com/pt-br/sql/ssms/download-sql-server-management-studio-ssms](https://docs.microsoft.com/pt-br/sql/ssms/download-sql-server-management-studio-ssms)
 
-## 🚀 Guia Rápido para o Time
+## Instalação
 
-Siga estes passos para configurar o projeto na sua máquina:
+### 1. Clonar o repositório
 
-### 1. Clonar o Repositório
-Abra o terminal na pasta onde deseja salvar o projeto e digite:
-git clone https://github.com/pimiii/pimIII.git
+```bash
+git clone <url-do-repositorio>
+cd pimIII/backend/c_sharp/estoque_farmacia
+```
 
-### 2. Acessar a Pasta do Código e Rodar
-cd pimIII/c_sharp/estoque_farmacia
+### 2. Restaurar dependências
+
+```bash
 dotnet restore
+```
+
+### 3. Configurar o banco de dados
+
+O projeto utiliza Entity Framework Core com migrações automáticas. Para criar o banco de dados:
+
+```bash
+dotnet ef database update
+```
+
+Isso criará automaticamente:
+- Banco de dados: `EstoqueFarmacia`
+- Tabelas: `Funcionarios`, `Produtos`, `Fornecedores`
+
+**Verificação (opcional):**
+Se tiver SQL Server Management Studio instalado, conecte-se a `.\SQLEXPRESS` e verifique se a base de dados `EstoqueFarmacia` foi criada.
+
+## Executando a Aplicação
+
+### Via linha de comando
+
+```bash
 dotnet run
+```
 
----
+### Credenciais padrão
 
-## 🛠️ Regras de Colaboração (Git)
+- **Login:** `admin`
+- **Senha:** `123`
 
-Para mantermos o código organizado e evitar conflitos:
+## Compilando um Executável
 
-1. **Sempre dê git pull antes de começar:** Isso evita que você tente subir algo baseado em uma versão antiga.
-2. **Não suba pastas de compilação:** O arquivo .gitignore já ignora as pastas bin e obj. Não force o envio delas.
-3. **Commits Claros:** Use mensagens que expliquem o que foi feito (Ex: git commit -m "Criada a classe Medicamento").
-4. **Trabalho em Dupla no Back:** Dividam os arquivos para não editarem a mesma linha ao mesmo tempo.
+Para criar um arquivo executável standalone que pode ser distribuído:
 
----
+```bash
+dotnet publish -c Release -o ./publish
+```
 
-## 🗄️ Banco de Dados
+O executável estará em: `./publish/estoque_farmacia.exe`
 
-Os scripts de criação estão em /database. Antes de rodar o sistema, execute o script script_criacao.sql no seu SQL Server local.
+## Estrutura do Projeto
 
----
+```
+estoque_farmacia/
+├── Models/              # Classes de domínio
+│   ├── Funcionario.cs
+│   ├── Produto.cs
+│   └── Fornecedor.cs
+├── Services/            # Lógica de negócio
+│   ├── FuncionarioService.cs
+│   ├── ProdutoService.cs
+│   └── FornecedorService.cs
+├── UI/                  # Interface do usuário (console)
+│   ├── Menu.cs
+│   ├── FuncionarioUI.cs
+│   ├── ProdutoUI.cs
+│   └── FornecedorUI.cs
+├── Data/                # Camada de dados (EF Core)
+│   ├── AppDbContext.cs
+│   └── AppDbContextFactory.cs
+├── Migrations/          # Histórico de migrações do banco
+├── Program.cs           # Ponto de entrada
+├── appsettings.json     # Configurações (connection string)
+└── estoque_farmacia.csproj
+```
 
-## 🎨 Protótipo UI/UX (Entregáveis)
+## Funcionalidades
 
-O sistema deve apresentar as seguintes funcionalidades/telas:
-1. **Login:** Acesso restrito para funcionários.
-2. **Dashboard:** Indicadores de produtos com estoque baixo ou vencendo.
-3. **Inventário:** Tabela geral para visualização e exclusão de itens.
-4. **Cadastro:** Tela para inserção de novos medicamentos.
-5. **Movimentação:** Registro de entradas (compras) e saídas (vendas).
+- **Controle de Funcionários**
+  - Cadastro, listagem, atualização e inativação de funcionários
+  - Persistência no banco de dados via EF Core
+
+- **Controle de Produtos**
+  - Gerenciamento de produtos do estoque
+  - Associação com fornecedores
+
+- **Controle de Fornecedores**
+  - Cadastro e gerenciamento de fornecedores
+
+- **Controle de Vendas**
+  - Módulo em desenvolvimento
+
+## Tecnologias Utilizadas
+
+- **.NET 10.0** - Framework
+- **C#** - Linguagem de programação
+- **Entity Framework Core 10.0.0** - ORM para acesso a dados
+- **SQL Server** - Banco de dados
+- **Dependency Injection** - Padrão de injeção de dependências
+
+## Solução de Problemas
+
+### Erro: "Erro ao Localizar Servidor/Instância Especificado"
+
+**Causa:** SQL Server não está instalado ou não está rodando.
+
+**Solução:**
+1. Instale SQL Server Express
+2. Inicie o serviço SQL Server:
+   - Windows: Abra "Serviços" (services.msc) e procure por "SQL Server (SQLEXPRESS)"
+   - Clique com botão direito → Iniciar
+
+### Erro: "The process cannot access the file"
+
+**Causa:** A aplicação está aberta e bloqueando a recompilação.
+
+**Solução:** Feche a aplicação antes de compilar novamente.
+
+### Erro: "Database does not exist"
+
+**Causa:** Migrations não foram aplicadas.
+
+**Solução:**
+```bash
+dotnet ef database update
+```
+
+## Autores
+
+Desenvolvido como projeto acadêmico (PIM III).
+
+## Licença
+
+MIT License
