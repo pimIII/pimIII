@@ -150,7 +150,16 @@ dotnet ef database update
 
 ## Autores
 
-Desenvolvido como projeto acadêmico (PIM III).
+Desenvolvido como projeto acadêmico (PIM III) pelos seguintes integrantes:
+
+- Anderson da Silva Araújo
+- Daniel Reis Oliveira
+- Eduardo Goulart Pessini
+- Geovanna Xavier Alves
+- Geovanni da Silva de Andrade
+- Patrick Hugo Costa Freitas
+- Roberto Matheus da Costa Domingues Martins
+- Vinicius Umeda de Araujo
 
 ## Licença
 
