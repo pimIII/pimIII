@@ -6,6 +6,12 @@ namespace estoque_farmacia.Models;
 public class Fornecedor
 {
     /// <summary>
+    /// ID ÚNICO do fornecedor (chave primária).
+    /// Auto-incrementado no banco de dados.
+    /// </summary>
+    public int Id { get; set; }
+
+    /// <summary>
     /// Nome da empresa fornecedora.
     /// </summary>
     public string NomeEmpresa { get; set; }

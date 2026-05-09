@@ -6,6 +6,12 @@ namespace estoque_farmacia.Models;
 public class Produto
 {
     /// <summary>
+    /// ID ÚNICO do produto (chave primária).
+    /// Auto-incrementado no banco de dados.
+    /// </summary>
+    public int Id { get; set; }
+
+    /// <summary>
     /// Nome do produto.
     /// </summary>
     public string NomeProduto { get; set; }

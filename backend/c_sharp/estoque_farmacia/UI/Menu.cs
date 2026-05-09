@@ -2,25 +2,17 @@ using estoque_farmacia.Models;
 using estoque_farmacia.Services;
 namespace estoque_farmacia.UI;
 
-
-public class Menu{
-
-    private readonly FornecedorService _fornecedorService = new FornecedorService();
-    private readonly ProdutoService _produtoService = new ProdutoService();
-    private readonly FuncionarioService _funcionarioService = new FuncionarioService();
+public class Menu
+{
     private readonly FornecedorUI _fornecedorUI;
     private readonly ProdutoUI _produtoUI;
     private readonly FuncionarioUI _funcionarioUI;
 
-    /// <summary>
-    /// Inicializa uma nova instância do menu principal da aplicação,
-    /// conectando as UIs aos seus serviços correspondentes.
-    /// </summary>
-    public Menu()
+    public Menu(FuncionarioUI funcionarioUI, ProdutoUI produtoUI, FornecedorUI fornecedorUI)
     {
-        _fornecedorUI = new FornecedorUI(_fornecedorService);
-        _produtoUI = new ProdutoUI(_produtoService);
-        _funcionarioUI = new FuncionarioUI(_funcionarioService);
+        _funcionarioUI = funcionarioUI;
+        _produtoUI = produtoUI;
+        _fornecedorUI = fornecedorUI;
     }
 
     
