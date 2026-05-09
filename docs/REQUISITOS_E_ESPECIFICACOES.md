@@ -627,8 +627,6 @@ Este documento serve como base para os Diagramas UML. Os Casos de Uso serão det
 
 ## REFERÊNCIAS
 
-ASSOCIAÇÃO BRASILEIRA DE NORMAS TÉCNICAS. NBR 14724: Informação e documentação - Trabalhos acadêmicos - Apresentação. Rio de Janeiro, 2011.
-
 SOMMERVILLE, I. Engenharia de Software. 9. ed. São Paulo: Pearson Prentice Hall, 2011.
 
 ---

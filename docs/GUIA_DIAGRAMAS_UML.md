@@ -386,8 +386,6 @@ Lucidchart: Tipos de Diagrama UML. Disponível em: https://www.lucidchart.com/pa
 
 Tutorialspoint: UML Tutorial. Disponível em: https://www.tutorialspoint.com/uml/
 
-ASSOCIAÇÃO BRASILEIRA DE NORMAS TÉCNICAS. NBR 14724: Informação e documentação - Trabalhos acadêmicos - Apresentação. Rio de Janeiro, 2011.
-
 ---
 
 Data: 2026-05-09  

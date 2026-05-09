@@ -1,5 +1,4 @@
 # 📋 GUIA EDUCATIVO - MÓDULO DE FUNCIONÁRIOS
-## Por Roberto - Implementação do Sistema de Gerenciamento de Funcionários
 
 ---
 
