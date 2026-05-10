@@ -1,54 +1,78 @@
 using estoque_farmacia.Models;
+using estoque_farmacia.Data;
 using System.Collections.Generic;
-using estoque_farmacia.UI;
+using System.Linq;
 
 namespace estoque_farmacia.Services;
 
-/// <summary>
-/// Serviço responsável pelas operações em memória sobre fornecedores.
-/// </summary>
 public class FornecedorService
 {
-    private List<Fornecedor> listaFornecedores = new List<Fornecedor>();
+    private readonly AppDbContext context;
 
-    /// <summary>
-    /// Adiciona um novo fornecedor à lista em memória.
-    /// </summary>
-    /// <param name="novoFornecedor">Fornecedor a ser adicionado.</param>
-    public void Salvar(Fornecedor novoFornecedor)
+    public FornecedorService(AppDbContext context)
     {
-        listaFornecedores.Add(novoFornecedor);
+        this.context = context;
     }
 
-    /// <summary>
-    /// Retorna todos os fornecedores cadastrados em memória.
-    /// </summary>
-    /// <returns>Lista de fornecedores.</returns>
-    public List<Fornecedor> ListarTodos()
+    public bool Salvar(Fornecedor novoFornecedor)
     {
-        return listaFornecedores;
-    }
-
-    /// <summary>
-    /// Remove um fornecedor pelo índice da lista.
-    /// </summary>
-    /// <param name="indice">Índice do fornecedor na lista.</param>
-    /// <returns>True se removido; caso contrário false.</returns>
-    public bool Remover(int indice)
-    {
-        // verifica se o indice existe na lista para não dar erro
-        if (indice >= 0 && indice < listaFornecedores.Count)
+        try
         {
-            listaFornecedores.RemoveAt(indice);
-            return true;
-        }
+            if (novoFornecedor == null || string.IsNullOrWhiteSpace(novoFornecedor.NomeEmpresa))
+            {
+                Console.WriteLine("  ERRO: Nome da empresa e obrigatorio.");
+                return false;
+            }
 
-        else
-        {
+            context.Fornecedores.Add(novoFornecedor);
+            int registros = context.SaveChanges();
+
+            if (registros > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"\n  Fornecedor '{novoFornecedor.NomeEmpresa}' salvo com sucesso! ID: {novoFornecedor.Id}");
+                Console.ResetColor();
+                return true;
+            }
+
             return false;
         }
-
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"\n  ERRO ao salvar fornecedor: {ex.Message}");
+            Console.ResetColor();
+            return false;
+        }
     }
 
+    public List<Fornecedor> ListarTodos()
+    {
+        return context.Fornecedores.ToList();
+    }
 
+    public Fornecedor BuscarPorId(int id)
+    {
+        return context.Fornecedores.FirstOrDefault(f => f.Id == id);
+    }
+
+    public bool Remover(int id)
+    {
+        try
+        {
+            var fornecedor = context.Fornecedores.FirstOrDefault(f => f.Id == id);
+            if (fornecedor == null) return false;
+
+            context.Fornecedores.Remove(fornecedor);
+            context.SaveChanges();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"\n  ERRO ao remover fornecedor: {ex.Message}");
+            Console.ResetColor();
+            return false;
+        }
+    }
 }
