@@ -22,38 +22,32 @@ public class Menu
         {
             Console.Clear();
 
-            // Header
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("\n╔════════════════════════════════════╗");
-            Console.WriteLine("║     💊 SISTEMA DE FARMÁCIA 💊      ║");
-            Console.WriteLine("╚════════════════════════════════════╝\n");
-
-            // Login
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write("👤 Login: ");
+            Console.WriteLine("\n  SISTEMA DE GESTAO DE FARMACIA");
+            Console.WriteLine("  ================================\n");
             Console.ResetColor();
+
+            Console.Write("  Login: ");
             string login = Console.ReadLine();
 
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write("🔐 Senha: ");
-            Console.ResetColor();
+            Console.Write("  Senha: ");
             string senha = Console.ReadLine();
 
             if (login == "admin" && senha == "123")
             {
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("\n✓ Login realizado com sucesso!");
+                Console.WriteLine("\n  Acesso autorizado.");
                 Console.ResetColor();
-                Thread.Sleep(1500);
+                Thread.Sleep(1200);
                 Console.Clear();
                 return true;
             }
             else
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("\n✗ Usuário ou senha incorretos.");
+                Console.WriteLine("\n  Usuario ou senha invalidos.");
                 Console.ResetColor();
-                Console.WriteLine("Pressione ENTER para tentar novamente...");
+                Console.WriteLine("  Pressione ENTER para tentar novamente...");
                 Console.ReadLine();
             }
         }
@@ -66,27 +60,20 @@ public class Menu
     {
         Console.Clear();
 
-        // Header
         Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("\n╔════════════════════════════════════╗");
-        Console.WriteLine("║       MENU PRINCIPAL FARMÁCIA       ║");
-        Console.WriteLine("╚════════════════════════════════════╝\n");
-
-        // Menu items
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("  1 📦 Controle de Produto");
-        Console.ForegroundColor = ConsoleColor.Blue;
-        Console.WriteLine("  2 👥 Controle de Funcionário");
-        Console.ForegroundColor = ConsoleColor.Magenta;
-        Console.WriteLine("  3 💳 Controle de Venda");
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine("  4 🏢 Controle de Fornecedor");
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine("  7 ❌ Sair");
-
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.Write("\n➜ Escolha uma opção: ");
+        Console.WriteLine("\n  MENU PRINCIPAL");
+        Console.WriteLine("  ================================\n");
         Console.ResetColor();
+
+        Console.WriteLine("  [1] Controle de Produto");
+        Console.WriteLine("  [2] Controle de Funcionario");
+        Console.WriteLine("  [3] Controle de Venda");
+        Console.WriteLine("  [4] Controle de Fornecedor");
+        Console.ForegroundColor = ConsoleColor.DarkGray;
+        Console.WriteLine("  [7] Sair");
+        Console.ResetColor();
+
+        Console.Write("\n  Opcao: ");
     }
 
     /// <summary>
@@ -125,8 +112,9 @@ public class Menu
 
                 default:
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("\n✗ Opção inválida. Pressione ENTER para continuar...");
+                Console.WriteLine("\n  Opcao invalida.");
                 Console.ResetColor();
+                Console.WriteLine("  Pressione ENTER para continuar...");
                 Console.ReadLine();
                 break;
 
@@ -138,11 +126,9 @@ public class Menu
     {
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("\n╔════════════════════════════════════╗");
-        Console.WriteLine("║     Obrigado por usar o Sistema     ║");
-        Console.WriteLine("║          Até logo! 👋             ║");
-        Console.WriteLine("╚════════════════════════════════════╝\n");
+        Console.WriteLine("\n  Sistema encerrado. Ate logo.");
         Console.ResetColor();
+        Thread.Sleep(1000);
     }
 
 

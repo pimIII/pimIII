@@ -109,26 +109,20 @@ public class FuncionarioUI
         Console.Clear();
 
         Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("\n╔══════════════════════════════════════╗");
-        Console.WriteLine("║   👥 CONTROLE DE FUNCIONÁRIOS 👥   ║");
-        Console.WriteLine("╚══════════════════════════════════════╝\n");
-
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("  1 ➕ Cadastrar novo funcionário");
-        Console.ForegroundColor = ConsoleColor.Blue;
-        Console.WriteLine("  2 📋 Listar todos os funcionários");
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine("  3 🔍 Buscar funcionário por ID");
-        Console.ForegroundColor = ConsoleColor.Magenta;
-        Console.WriteLine("  4 ✏️  Atualizar funcionário");
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine("  5 🚫 Inativar funcionário");
-        Console.ForegroundColor = ConsoleColor.Gray;
-        Console.WriteLine("  6 ↩️  Voltar\n");
-
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.Write("➜ Escolha uma opção: ");
+        Console.WriteLine("\n  CONTROLE DE FUNCIONARIOS");
+        Console.WriteLine("  ================================\n");
         Console.ResetColor();
+
+        Console.WriteLine("  [1] Cadastrar novo funcionario");
+        Console.WriteLine("  [2] Listar todos os funcionarios");
+        Console.WriteLine("  [3] Buscar funcionario por ID");
+        Console.WriteLine("  [4] Atualizar funcionario");
+        Console.WriteLine("  [5] Inativar funcionario");
+        Console.ForegroundColor = ConsoleColor.DarkGray;
+        Console.WriteLine("  [6] Voltar");
+        Console.ResetColor();
+
+        Console.Write("\n  Opcao: ");
     }
 
     // ========================================================================
