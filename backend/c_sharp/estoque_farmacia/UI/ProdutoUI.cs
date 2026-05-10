@@ -62,10 +62,10 @@ public class ProdutoUI
                     }
                     else
                     {
-                        for(int i = 0; i < lista.Count; i++)
+                        foreach (var p in lista)
                         {
-                            //@ pra pular linha
-                            Console.WriteLine($"ID: {i+1} | Produto: {lista[i].NomeProduto} | Preço venda: {lista[i].PrecoVenda} | Preco Custo: {lista[i].PrecoCusto} | Requer Receita: {lista[i].RequerReceita} ");
+                            string receita = p.RequerReceita ? "Sim" : "Nao";
+                            Console.WriteLine($"  ID: {p.Id} | {p.NomeProduto} | Venda: R$ {p.PrecoVenda:F2} | Custo: R$ {p.PrecoCusto:F2} | Receita: {receita}");
                         }
                     }
 
@@ -103,76 +103,60 @@ public class ProdutoUI
     /// </summary>
     public void CadastrarProduto()
     {
-        Console.Write("\n");
-        Console.Write("Digite o nome do produto: ");
+        Console.WriteLine();
+
+        Console.Write("Nome do produto: ");
         string nome = Console.ReadLine();
-
-        // Enquanto o nome for nulo, vazio ou só espaços
         while (string.IsNullOrWhiteSpace(nome))
-        {Console.Write("\nO nome não pode ser vazio! Digite o nome: ");
-        nome = Console.ReadLine();}         
-
-
-             
-        Console.Write("Digite o preço de venda: R$");
-        decimal precoVenda;
-        while (! decimal.TryParse(Console.ReadLine(), out precoVenda))
-        { Console.Write("\nValor inválido! Digite o preço novamente: R$ ");}
-        
-        
-        Console.Write("Digite o preço de custo: R$");
-        decimal precoCusto;
-        while (! decimal.TryParse(Console.ReadLine(), out precoCusto))
-        { Console.Write("\nValor inválido! Digite o preço novamente: R$ ");}
-        
-
-        
-        Console.Write("Digite o Id do fornecedor: ");
-        int idFornecedor;
-        while (! int.TryParse(Console.ReadLine(), out idFornecedor))
-        {Console.Write("\nSomente números são aceitos: ");}
-        
-        bool requerReceita = false;
-        int requerReceitaInt;
-        while(true){
-        Console.Write("Requer receita [0 ou 1]: ");
-            while (! int.TryParse(Console.ReadLine(), out requerReceitaInt))
-            {Console.Write("\nSomente números são aceitos: ");}
-
-        if (requerReceitaInt == 0)
-            {requerReceita = false;
-            break;}
-
-        else if (requerReceitaInt == 1)
-            {requerReceita = true;
-            break;}
-
-            else
-            {Console.Write("Digite somente 1 ou 2. ");}
-
-
-        
-        
+        {
+            Console.Write("  Nome nao pode ser vazio. Digite novamente: ");
+            nome = Console.ReadLine();
         }
 
-        
+        Console.Write("Preco de venda (ex: 12,50): R$ ");
+        decimal precoVenda;
+        while (!decimal.TryParse(Console.ReadLine(), out precoVenda) || precoVenda < 0 || decimal.Round(precoVenda, 2) != precoVenda)
+        {
+            Console.Write("  Valor invalido. Use virgula e ate 2 casas decimais (ex: 12,50): R$ ");
+        }
+
+        Console.Write("Preco de custo (ex: 8,00): R$ ");
+        decimal precoCusto;
+        while (!decimal.TryParse(Console.ReadLine(), out precoCusto) || precoCusto < 0 || decimal.Round(precoCusto, 2) != precoCusto)
+        {
+            Console.Write("  Valor invalido. Use virgula e ate 2 casas decimais (ex: 8,00): R$ ");
+        }
+
+        Console.Write("ID do fornecedor: ");
+        int idFornecedor;
+        while (!int.TryParse(Console.ReadLine(), out idFornecedor) || idFornecedor <= 0)
+        {
+            Console.Write("  Digite um numero valido: ");
+        }
+
+        bool requerReceita;
+        while (true)
+        {
+            Console.Write("Requer receita medica? (S/N): ");
+            string resposta = Console.ReadLine()?.Trim().ToUpper();
+            if (resposta == "S") { requerReceita = true; break; }
+            if (resposta == "N") { requerReceita = false; break; }
+            Console.WriteLine("  Digite apenas S ou N.");
+        }
+
         Produto novo = new Produto
         {
-        NomeProduto = nome,
-        PrecoVenda = precoVenda,
-        PrecoCusto = precoCusto,
-        IdFornecedor = idFornecedor,
-        RequerReceita = requerReceita
+            NomeProduto = nome,
+            PrecoVenda = precoVenda,
+            PrecoCusto = precoCusto,
+            IdFornecedor = idFornecedor,
+            RequerReceita = requerReceita
         };
 
         _produtoService.Salvar(novo);
 
-
-        
-        Console.WriteLine("\n");
-        Console.WriteLine("Produto cadastrado com sucesso!\n");
-
-
+        Console.WriteLine("  Pressione ENTER para continuar...");
+        Console.ReadLine();
     }
 
 
@@ -181,28 +165,32 @@ public class ProdutoUI
     /// </summary>
     public void RemoverProduto()
     {
-        Console.Write("Digite o ID do produto a ser removido: ");
-        
-        if (int.TryParse(Console.ReadLine(), out int idDigitado))
-        {
-            int indice = idDigitado - 1; //ajusta o indice
-            if (_produtoService.Remover(indice) == true) {
-            Console.WriteLine("Produto removido com sucesso!");}
+        Console.Write("\nID do produto a remover: ");
 
+        if (int.TryParse(Console.ReadLine(), out int id) && id > 0)
+        {
+            if (_produtoService.Remover(id))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("  Produto removido com sucesso.");
+                Console.ResetColor();
+            }
             else
             {
-                Console.WriteLine("Produto não encontrado.");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("  Produto nao encontrado.");
+                Console.ResetColor();
             }
-
         }
-
         else
-        {   Console.Write("\n");
-            Console.WriteLine("Digite apenas valores numéricos.");
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("  ID invalido.");
+            Console.ResetColor();
         }
 
-
-
+        Console.WriteLine("  Pressione ENTER para continuar...");
+        Console.ReadLine();
     }
 
 
