@@ -1,53 +1,78 @@
-using estoque_farmacia.Models;
+﻿using estoque_farmacia.Models;
+using estoque_farmacia.Data;
 using System.Collections.Generic;
+using System.Linq;
 
-/// <summary>
-/// Serviço responsável pelas operações de CRUD em memória para produtos.
-/// Este serviço mantém uma lista simples de produtos durante a execução.
-/// </summary>
+namespace estoque_farmacia.Services;
+
 public class ProdutoService
 {
-    private List<Produto> listaProdutos = new List<Produto>();
+    private readonly AppDbContext context;
 
-    /// <summary>
-    /// Salva um novo produto na lista em memória.
-    /// </summary>
-    /// <param name="novoProduto">Objeto Produto a ser adicionado.</param>
-    public void Salvar(Produto novoProduto)
+    public ProdutoService(AppDbContext context)
     {
-        listaProdutos.Add(novoProduto);
-
+        this.context = context;
     }
 
-    /// <summary>
-    /// Retorna todos os produtos atualmente salvos em memória.
-    /// </summary>
-    /// <returns>Lista de produtos.</returns>
-    public List<Produto> ListarTodos()
+    public bool Salvar(Produto novoProduto)
     {
-        return listaProdutos;
-    }
-
-    /// <summary>
-    /// Remove um produto pelo índice da lista.
-    /// </summary>
-    /// <param name="indice">Índice do produto na lista.</param>
-    /// <returns>True se removido com sucesso; caso contrário false.</returns>
-    public bool Remover(int indice)
-    {
-        if (indice >= 0 && indice < listaProdutos.Count)
+        try
         {
-            listaProdutos.RemoveAt(indice); // remove especificamente no índice
-            return true;
-        }
+            if (novoProduto == null || string.IsNullOrWhiteSpace(novoProduto.NomeProduto))
+            {
+                Console.WriteLine("  ERRO: Nome do produto e obrigatorio.");
+                return false;
+            }
 
-        else
-        {
+            context.Produtos.Add(novoProduto);
+            int registros = context.SaveChanges();
+
+            if (registros > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"\n  Produto '{novoProduto.NomeProduto}' salvo com sucesso! ID: {novoProduto.Id}");
+                Console.ResetColor();
+                return true;
+            }
+
             return false;
         }
-
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"\n  ERRO ao salvar produto: {ex.Message}");
+            Console.ResetColor();
+            return false;
+        }
     }
 
+    public List<Produto> ListarTodos()
+    {
+        return context.Produtos.ToList();
+    }
 
+    public Produto BuscarPorId(int id)
+    {
+        return context.Produtos.FirstOrDefault(p => p.Id == id);
+    }
 
+    public bool Remover(int id)
+    {
+        try
+        {
+            var produto = context.Produtos.FirstOrDefault(p => p.Id == id);
+            if (produto == null) return false;
+
+            context.Produtos.Remove(produto);
+            context.SaveChanges();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"\n  ERRO ao remover produto: {ex.Message}");
+            Console.ResetColor();
+            return false;
+        }
+    }
 }
