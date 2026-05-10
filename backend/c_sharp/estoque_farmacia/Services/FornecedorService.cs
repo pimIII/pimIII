@@ -1,4 +1,4 @@
-using estoque_farmacia.Models;
+﻿using estoque_farmacia.Models;
 using estoque_farmacia.Data;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +7,8 @@ namespace estoque_farmacia.Services;
 
 public class FornecedorService
 {
+    public string UltimoErro { get; private set; } = string.Empty;
+
     private readonly AppDbContext context;
 
     public FornecedorService(AppDbContext context)
@@ -20,7 +22,7 @@ public class FornecedorService
         {
             if (novoFornecedor == null || string.IsNullOrWhiteSpace(novoFornecedor.NomeEmpresa))
             {
-                Console.WriteLine("  ERRO: Nome da empresa e obrigatorio.");
+                UltimoErro = "  ERRO: Nome da empresa e obrigatorio."; Console.WriteLine(UltimoErro);
                 return false;
             }
 
@@ -40,7 +42,7 @@ public class FornecedorService
         catch (Exception ex)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"\n  ERRO ao salvar fornecedor: {ex.Message}");
+            UltimoErro = $"\n  ERRO ao salvar fornecedor: {ex.Message}"; Console.WriteLine(UltimoErro);
             Console.ResetColor();
             return false;
         }
@@ -70,7 +72,7 @@ public class FornecedorService
         catch (Exception ex)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"\n  ERRO ao remover fornecedor: {ex.Message}");
+            UltimoErro = $"\n  ERRO ao remover fornecedor: {ex.Message}"; Console.WriteLine(UltimoErro);
             Console.ResetColor();
             return false;
         }

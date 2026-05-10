@@ -6,6 +6,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 
+// Habilita o comportamento antigo do Npgsql para DateTime sem Kind=Utc.
+// Sem isso, gravar DateTime.Now em colunas de data falha porque o driver
+// exige UTC explicito.
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 // Carregar configurações
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)

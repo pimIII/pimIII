@@ -230,7 +230,9 @@ public class FuncionarioForm : Form
         }
         else
         {
-            MessageBox.Show("Nao foi possivel salvar (CPF ja cadastrado?).", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            // Mostra o motivo real exposto pelo service.
+            var motivo = string.IsNullOrEmpty(_service.UltimoErro) ? "motivo desconhecido" : _service.UltimoErro;
+            MessageBox.Show("Nao foi possivel salvar.\n\n" + motivo, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -251,7 +253,8 @@ public class FuncionarioForm : Form
         }
         else
         {
-            MessageBox.Show("Nao foi possivel inativar.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            var motivo = string.IsNullOrEmpty(_service.UltimoErro) ? "motivo desconhecido" : _service.UltimoErro;
+            MessageBox.Show("Nao foi possivel inativar.\n\n" + motivo, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 

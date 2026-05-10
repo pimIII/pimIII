@@ -1,4 +1,4 @@
-using estoque_farmacia.Models;
+﻿using estoque_farmacia.Models;
 using estoque_farmacia.Data;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,6 +61,13 @@ namespace estoque_farmacia.Services;
 /// </summary>
 public class FuncionarioService
 {
+    /// <summary>
+    /// Mensagem do ultimo erro ocorrido em qualquer operacao do service.
+    /// A UI consulta esta propriedade para exibir o motivo real da falha
+    /// quando Salvar/Atualizar/Inativar/Remover retornam false.
+    /// </summary>
+    public string UltimoErro { get; private set; } = string.Empty;
+
     // ATRIBUTO: Referência ao DbContext
     /// <summary>
     /// Referência ao DbContext - PONTE COM O BANCO DE DADOS
@@ -180,21 +187,21 @@ public class FuncionarioService
             // VALIDAÇÃO: verifica se o objeto é nulo (vazio)
             if (novoFuncionario == null)
             {
-                Console.WriteLine("ERRO: Funcionário não pode ser nulo!");
+                UltimoErro = "ERRO: Funcionário não pode ser nulo!"; Console.WriteLine(UltimoErro);
                 return false;
             }
 
             // VALIDAÇÃO: verifica se o nome está preenchido
             if (string.IsNullOrWhiteSpace(novoFuncionario.Nome))
             {
-                Console.WriteLine("ERRO: Nome do funcionário é obrigatório!");
+                UltimoErro = "ERRO: Nome do funcionário é obrigatório!"; Console.WriteLine(UltimoErro);
                 return false;
             }
 
             // VALIDAÇÃO: verifica se o CPF está preenchido
             if (string.IsNullOrWhiteSpace(novoFuncionario.CPF))
             {
-                Console.WriteLine("ERRO: CPF é obrigatório!");
+                UltimoErro = "ERRO: CPF é obrigatório!"; Console.WriteLine(UltimoErro);
                 return false;
             }
 
@@ -211,7 +218,7 @@ public class FuncionarioService
             // EF Core converte em: SELECT COUNT(*) FROM Funcionarios WHERE CPF = '123...'
             if (context.Funcionarios.Any(f => f.CPF == novoFuncionario.CPF))
             {
-                Console.WriteLine("ERRO: Já existe funcionário com este CPF!");
+                UltimoErro = "ERRO: Já existe funcionário com este CPF!"; Console.WriteLine(UltimoErro);
                 return false;
             }
 
@@ -245,7 +252,7 @@ public class FuncionarioService
             }
             else
             {
-                Console.WriteLine("ERRO: Não conseguiu salvar o funcionário (SaveChanges retornou 0)");
+                UltimoErro = "ERRO: Não conseguiu salvar o funcionário (SaveChanges retornou 0)"; Console.WriteLine(UltimoErro);
                 return false;
             }
         }
@@ -255,7 +262,7 @@ public class FuncionarioService
             // Captura a exceção e mostra mensagem
             // Depois de SaveChanges() em erro, DbContext pode ficar inconsistente
             // Por isso é bom usar try/catch
-            Console.WriteLine($"ERRO ao salvar funcionário: {ex.Message}");
+            UltimoErro = $"ERRO ao salvar funcionário: {ex.Message}"; Console.WriteLine(UltimoErro);
             return false;
         }
     }
@@ -453,7 +460,7 @@ public class FuncionarioService
             // Validação
             if (funcionarioAtualizado == null || funcionarioAtualizado.Id <= 0)
             {
-                Console.WriteLine("ERRO: Funcionário ou ID inválido!");
+                UltimoErro = "ERRO: Funcionário ou ID inválido!"; Console.WriteLine(UltimoErro);
                 return false;
             }
 
@@ -492,13 +499,13 @@ public class FuncionarioService
             }
             else
             {
-                Console.WriteLine("ERRO: Não conseguiu atualizar o funcionário");
+                UltimoErro = "ERRO: Não conseguiu atualizar o funcionário"; Console.WriteLine(UltimoErro);
                 return false;
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"ERRO ao atualizar funcionário: {ex.Message}");
+            UltimoErro = $"ERRO ao atualizar funcionário: {ex.Message}"; Console.WriteLine(UltimoErro);
             return false;
         }
     }
@@ -559,13 +566,13 @@ public class FuncionarioService
             }
             else
             {
-                Console.WriteLine("ERRO: Não conseguiu inativar o funcionário");
+                UltimoErro = "ERRO: Não conseguiu inativar o funcionário"; Console.WriteLine(UltimoErro);
                 return false;
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"ERRO ao inativar funcionário: {ex.Message}");
+            UltimoErro = $"ERRO ao inativar funcionário: {ex.Message}"; Console.WriteLine(UltimoErro);
             return false;
         }
     }
@@ -623,13 +630,13 @@ public class FuncionarioService
             }
             else
             {
-                Console.WriteLine("ERRO: Não conseguiu remover o funcionário");
+                UltimoErro = "ERRO: Não conseguiu remover o funcionário"; Console.WriteLine(UltimoErro);
                 return false;
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"ERRO ao remover funcionário: {ex.Message}");
+            UltimoErro = $"ERRO ao remover funcionário: {ex.Message}"; Console.WriteLine(UltimoErro);
             return false;
         }
     }

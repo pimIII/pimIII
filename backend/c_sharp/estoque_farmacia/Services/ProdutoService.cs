@@ -1,4 +1,4 @@
-using estoque_farmacia.Models;
+﻿using estoque_farmacia.Models;
 using estoque_farmacia.Data;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +7,8 @@ namespace estoque_farmacia.Services;
 
 public class ProdutoService
 {
+    public string UltimoErro { get; private set; } = string.Empty;
+
     private readonly AppDbContext context;
 
     public ProdutoService(AppDbContext context)
@@ -20,7 +22,7 @@ public class ProdutoService
         {
             if (novoProduto == null || string.IsNullOrWhiteSpace(novoProduto.NomeProduto))
             {
-                Console.WriteLine("  ERRO: Nome do produto e obrigatorio.");
+                UltimoErro = "  ERRO: Nome do produto e obrigatorio."; Console.WriteLine(UltimoErro);
                 return false;
             }
 
@@ -40,7 +42,7 @@ public class ProdutoService
         catch (Exception ex)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"\n  ERRO ao salvar produto: {ex.Message}");
+            UltimoErro = $"\n  ERRO ao salvar produto: {ex.Message}"; Console.WriteLine(UltimoErro);
             Console.ResetColor();
             return false;
         }
@@ -70,7 +72,7 @@ public class ProdutoService
         catch (Exception ex)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"\n  ERRO ao remover produto: {ex.Message}");
+            UltimoErro = $"\n  ERRO ao remover produto: {ex.Message}"; Console.WriteLine(UltimoErro);
             Console.ResetColor();
             return false;
         }

@@ -38,6 +38,12 @@ internal static class Program
         // Inicializacao padrao do WinForms (visual styles, DPI, fonte padrao).
         ApplicationConfiguration.Initialize();
 
+        // Habilita o comportamento antigo do Npgsql para DateTime sem Kind=Utc.
+        // Sem isso, gravar DateTime.Now em colunas de data falha porque o driver
+        // exige UTC explicito. Este switch e o caminho oficial recomendado quando
+        // o projeto nao quer reescrever todos os DateTime.Now como DateTime.UtcNow.
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
         // Le a string de conexao do appsettings.json.
         // O arquivo e copiado para a pasta de build via "CopyToOutputDirectory"
         // configurado no csproj.

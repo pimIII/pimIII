@@ -172,7 +172,8 @@ public class FornecedorForm : Form
         }
         else
         {
-            MessageBox.Show("Nao foi possivel salvar.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            var motivo = string.IsNullOrEmpty(_service.UltimoErro) ? "motivo desconhecido" : _service.UltimoErro;
+            MessageBox.Show("Nao foi possivel salvar.\n\n" + motivo, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -193,7 +194,8 @@ public class FornecedorForm : Form
         }
         else
         {
-            MessageBox.Show("Nao foi possivel remover.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            var motivo2 = string.IsNullOrEmpty(_service.UltimoErro) ? "motivo desconhecido" : _service.UltimoErro;
+            MessageBox.Show("Nao foi possivel remover.\n\n" + motivo2, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
