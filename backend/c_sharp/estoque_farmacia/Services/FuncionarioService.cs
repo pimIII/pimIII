@@ -30,7 +30,7 @@ namespace estoque_farmacia.Services;
 ///
 /// EVOLUÇÃO DO PADRÃO:
 /// - ANTES: Em memória (List<Funcionario>) - dados perdidos ao fechar app
-/// - AGORA: Entity Framework Core + SQL Server - dados persistem no banco
+/// - AGORA: Entity Framework Core + PostgreSQL - dados persistem no banco
 /// - RESULTADO: Dados reais, compartilhados, auditáveis
 ///
 /// ---
@@ -43,8 +43,8 @@ namespace estoque_farmacia.Services;
 /// - Só funciona para UM usuário por vez
 /// - Sem persistência
 ///
-/// COM DbContext + SQL Server (AGORA):
-/// - Dados em arquivo SQL Server
+/// COM DbContext + PostgreSQL (AGORA):
+/// - Dados em arquivo PostgreSQL
 /// - Dados persistem para sempre (ou até deletar)
 /// - Múltiplos usuários podem acessar simultaneamente
 /// - Backup e segurança do banco de dados
@@ -66,7 +66,7 @@ public class FuncionarioService
     /// Referência ao DbContext - PONTE COM O BANCO DE DADOS
     ///
     /// O QUE É DbContext?
-    /// - É a conexão entre código C# e banco de dados SQL Server
+    /// - É a conexão entre código C# e banco de dados PostgreSQL
     /// - Gerencia entidades (objetos C#)
     /// - Rastreia mudanças (tracking)
     /// - Executa SaveChanges() para persistir dados
@@ -106,14 +106,14 @@ public class FuncionarioService
     /// EXEMPLO:
     /// // Em Program.cs:
     /// services.AddDbContext<AppDbContext>(options =>
-    ///     options.UseSqlServer(connectionString)
+    ///     options.UseNpgsql(connectionString)
     /// );
     ///
     /// // Depois, ASP.NET automaticamente injeta AppDbContext no constructor
     /// var service = new FuncionarioService(context); // context é injetado
     ///
     /// ALTERNATIVA (Sem injeção):
-    /// private AppDbContext context = new AppDbContext(); // ❌ RUIM
+    /// private AppDbContext context = new AppDbContext(); // PRATICA RUIM
     /// - Difícil testar
     /// - Tight coupling
     /// - Menos flexível
@@ -147,7 +147,7 @@ public class FuncionarioService
     /// 7. Chama context.SaveChanges() para PERSISTIR NO BANCO
     /// 8. Entity Framework Core:
     ///    a. Gera SQL INSERT automaticamente
-    ///    b. Executa no SQL Server
+    ///    b. Executa no PostgreSQL
     ///    c. Retorna o ID gerado (AUTO INCREMENT)
     ///
     /// FLUXO DETALHADO:
@@ -216,7 +216,7 @@ public class FuncionarioService
             }
 
             // Define a data de admissão como hoje
-            // EF Core salva como DATETIME no SQL Server
+            // EF Core salva como DATETIME no PostgreSQL
             novoFuncionario.DataAdmissao = DateTime.Now;
 
             // Marca como ativo por padrão
@@ -231,8 +231,8 @@ public class FuncionarioService
             // SaveChanges():
             // 1. Analisa todas as entidades "Added"
             // 2. Gera SQL INSERT
-            // 3. Executa no SQL Server
-            // 4. SQL Server gera o ID automaticamente
+            // 3. Executa no PostgreSQL
+            // 4. PostgreSQL gera o ID automaticamente
             // 5. Retorna o número de registros afetados
             // 6. Atualiza novoFuncionario.Id com o valor gerado!
             int registrosAfetados = context.SaveChanges();
@@ -240,7 +240,7 @@ public class FuncionarioService
             // Verifica se realmente salvou
             if (registrosAfetados > 0)
             {
-                Console.WriteLine($"✓ Funcionário '{novoFuncionario.Nome}' salvo com sucesso! ID: {novoFuncionario.Id}");
+                Console.WriteLine($"Funcionário '{novoFuncionario.Nome}' salvo com sucesso! ID: {novoFuncionario.Id}");
                 return true;
             }
             else
@@ -487,7 +487,7 @@ public class FuncionarioService
 
             if (registrosAfetados > 0)
             {
-                Console.WriteLine($"✓ Funcionário '{funcionarioExistente.Nome}' atualizado com sucesso!");
+                Console.WriteLine($"Funcionário '{funcionarioExistente.Nome}' atualizado com sucesso!");
                 return true;
             }
             else
@@ -554,7 +554,7 @@ public class FuncionarioService
 
             if (registrosAfetados > 0)
             {
-                Console.WriteLine($"✓ Funcionário '{funcionario.Nome}' inativado com sucesso!");
+                Console.WriteLine($"Funcionário '{funcionario.Nome}' inativado com sucesso!");
                 return true;
             }
             else
@@ -573,7 +573,7 @@ public class FuncionarioService
     /// <summary>
     /// Remove FISICAMENTE um funcionário do banco de dados (HARD DELETE).
     ///
-    /// ⚠️ CUIDADO: Use com MUITA moderação!
+    /// ATENCAO: Use com MUITA moderação!
     /// Na maioria dos casos, prefira Inativar() em vez de Remover()!
     ///
     /// CONSEQUÊNCIAS DE HARD DELETE:
@@ -618,7 +618,7 @@ public class FuncionarioService
 
             if (registrosAfetados > 0)
             {
-                Console.WriteLine($"✓ Funcionário removido completamente do sistema!");
+                Console.WriteLine($"Funcionário removido completamente do sistema!");
                 return true;
             }
             else

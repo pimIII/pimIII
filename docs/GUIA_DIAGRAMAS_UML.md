@@ -1,4 +1,4 @@
-# GUIA PARA CRIAR DIAGRAMAS UML
+﻿# GUIA PARA CRIAR DIAGRAMAS UML
 ## Sistema de Gerenciamento de Estoque de Farmácia
 
 ---
@@ -89,10 +89,10 @@ Relacionamentos: linhas conectando atores aos casos de uso
    - UC08: Gerenciar Fornecedores
 
 4. Conectar Atores aos Casos de Uso: Desenhe linhas associando:
-   - Gerente → Todos os casos de uso
-   - Farmacêutico → Login, Registrar Venda, Consultar Estoque
-   - Atendente → Login, Registrar Venda, Consultar Estoque
-   - Estoquista → Login, Gerenciar Produtos, Consultar Estoque
+   - Gerente  Todos os casos de uso
+   - Farmacêutico  Login, Registrar Venda, Consultar Estoque
+   - Atendente  Login, Registrar Venda, Consultar Estoque
+   - Estoquista  Login, Gerenciar Produtos, Consultar Estoque
 
 ### 2.4 Exemplo visual
 
@@ -100,19 +100,19 @@ Relacionamentos: linhas conectando atores aos casos de uso
                     ┌─────────────────────────────────────┐
                     │  SISTEMA DE ESTOQUE FARMÁCIA       │
                     │                                     │
-   ┌─ Gerente ──────┼─→ UC01: Login                      │
+   ┌─ Gerente ──────┼─ UC01: Login                      │
    │                │                                     │
-   │                │─→ UC02: Cadastrar Funcionário      │
+   │                │─ UC02: Cadastrar Funcionário      │
    │                │                                     │
-Farmacêutico ───────┼─→ UC03: Registrar Venda            │
+Farmacêutico ───────┼─ UC03: Registrar Venda            │
    │                │                                     │
-   │                │─→ UC04: Consultar Estoque          │
+   │                │─ UC04: Consultar Estoque          │
    │                │                                     │
-Atendente ──────────┼─→ UC05: Gerar Relatórios           │
+Atendente ──────────┼─ UC05: Gerar Relatórios           │
    │                │                                     │
-   │                │─→ UC06: Gerenciar Produtos         │
+   │                │─ UC06: Gerenciar Produtos         │
    │                │                                     │
-Estoquista ─────────┼─→ UC07: Gerenciar Fornecedores    │
+Estoquista ─────────┼─ UC07: Gerenciar Fornecedores    │
                     │                                     │
                     └─────────────────────────────────────┘
 ```
@@ -145,10 +145,10 @@ Estoque: Gerencia os lotes de produtos
 
 ```
 ┌─────────────────────────────┐
-│ Funcionário                 │ ← Nome da classe
+│ Funcionário                 │  Nome da classe
 ├─────────────────────────────┤
 │ - Id: int                   │
-│ - Nome: string              │ ← Propriedades (atributos)
+│ - Nome: string              │  Propriedades (atributos)
 │ - CPF: string               │
 │ - Cargo: string             │
 │ - SenhaHash: string         │
@@ -157,7 +157,7 @@ Estoque: Gerencia os lotes de produtos
 │ - DataDemissao: DateTime?   │
 ├─────────────────────────────┤
 │ + Salvar()                  │
-│ + ListarTodos()             │ ← Métodos
+│ + ListarTodos()             │  Métodos
 │ + BuscarPorId(id)           │
 │ + Atualizar()               │
 │ + Inativar()                │
@@ -165,25 +165,25 @@ Estoque: Gerencia os lotes de produtos
 ```
 
 2. Desenhar relacionamentos entre classes:
-   - Seta simples (→) para agregação (um tem um)
+   - Seta simples () para agregação (um tem um)
    - Seta preenchida (▶) para composição (deve ter um)
    - Linha simples (-) para associação
 
 3. Relacionamentos principais:
-   - Produto → Fornecedor (Um Fornecedor tem MUITOS Produtos)
-   - Venda → Funcionário (Uma Venda foi feita por UM Funcionário)
-   - Venda → Produto (Uma Venda contém MUITOS Produtos)
-   - Lote → Produto (Um Produto tem MUITOS Lotes)
-   - Estoque → Lote (Estoque controla os Lotes)
+   - Produto  Fornecedor (Um Fornecedor tem MUITOS Produtos)
+   - Venda  Funcionário (Uma Venda foi feita por UM Funcionário)
+   - Venda  Produto (Uma Venda contém MUITOS Produtos)
+   - Lote  Produto (Um Produto tem MUITOS Lotes)
+   - Estoque  Lote (Estoque controla os Lotes)
 
 ### 3.4 Notação UML para relacionamentos:
 
 ```
-Classe A → Classe B  (A tem um B)
+Classe A  Classe B  (A tem um B)
 1 * (A tem 1, B tem muitos)
 
 Exemplo:
-Fornecedor ──────── 1 ─→ * ─────── Produto
+Fornecedor ──────── 1 ─ * ─────── Produto
 (Um fornecedor tem MUITOS produtos)
 ```
 
@@ -200,20 +200,20 @@ Representar a ordem de interação entre objetos para realizar uma operação.
 ```
 Atendente     UI              Service         Banco
    │           │                 │            │
-   │─Registrar Venda─→│          │            │
-   │           │─Validar Estoque→│            │
+   │─Registrar Venda─│          │            │
+   │           │─Validar Estoque│            │
    │           │                 │            │
-   │           │                 │─Buscar Lotes─→│
-   │           │                 │←─Retorna Lotes│
+   │           │                 │─Buscar Lotes─│
+   │           │                 │─Retorna Lotes│
    │           │                 │            │
-   │           │                 │─Validar Data→│
-   │           │                 │←─OK─────────│
+   │           │                 │─Validar Data│
+   │           │                 │─OK─────────│
    │           │                 │            │
-   │           │                 │─Reduzir Estoque─→│
-   │           │                 │←─Atualizado────│
+   │           │                 │─Reduzir Estoque─│
+   │           │                 │─Atualizado────│
    │           │                 │            │
-   │           │←─Venda OK───────│            │
-   │←─"Venda #123"──│           │            │
+   │           │─Venda OK───────│            │
+   │─"Venda #123"──│           │            │
    │           │                 │            │
 ```
 
@@ -234,15 +234,15 @@ Atendente     UI              Service         Banco
 4. Exemplo do caso "Registrar Venda":
 
    ```
-   1. Atendente → UI: "Registrar Venda"
-   2. UI → Service: "Validar(produto, quantidade)"
-   3. Service → BD: "Buscar Estoque(idProduto)"
-   4. BD → Service: "Retorna Lote [...]"
-   5. Service → Service: "Validar Validade"
-   6. Service → BD: "Atualizar Estoque(...)"
-   7. BD → Service: "OK"
-   8. Service → UI: "Retorna true"
-   9. UI → Atendente: "Venda Realizada #123"
+   1. Atendente  UI: "Registrar Venda"
+   2. UI  Service: "Validar(produto, quantidade)"
+   3. Service  BD: "Buscar Estoque(idProduto)"
+   4. BD  Service: "Retorna Lote [...]"
+   5. Service  Service: "Validar Validade"
+   6. Service  BD: "Atualizar Estoque(...)"
+   7. BD  Service: "OK"
+   8. Service  UI: "Retorna true"
+   9. UI  Atendente: "Venda Realizada #123"
    ```
 
 ---
@@ -260,7 +260,7 @@ Cliente (Máquina do Usuário):
 - .NET Runtime
 
 Servidor (Máquina do Servidor):
-- SQL Server
+- PostgreSQL
 - Backup automatizado
 
 Rede:
@@ -274,11 +274,11 @@ Rede:
 │  (Gerente/Estoquista)   │          │  (Sala de Servidores)    │
 │                         │          │                          │
 │ ┌─────────────────────┐ │          │ ┌──────────────────────┐ │
-│ │ App Estoque.exe     │ │          │ │ SQL Server 2019      │ │
+│ │ App Estoque.exe     │ │          │ │ PostgreSQL 2019      │ │
 │ │ .NET 6.0            │ │          │ │ (Banco de Dados)     │ │
 │ └─────────────────────┘ │          │ └──────────────────────┘ │
 │         │               │          │         │                │
-│         │ HTTP/TCP 1433 │←────────→│         │                │
+│         │ HTTP/TCP 1433 │────────│         │                │
 │         │               │          │         │                │
 │   Windows 10/11         │          │  Windows Server 2019     │
 │                         │          │                          │

@@ -1,6 +1,13 @@
 # Sistema de Estoque Farmácia
 
-Sistema de gerenciamento de estoque para farmácia, desenvolvido em C# com .NET 10.0 e Entity Framework Core, utilizando SQL Server como banco de dados.
+Sistema de gerenciamento de estoque para farmácia, desenvolvido em C# com .NET 10.0 e Entity Framework Core, utilizando PostgreSQL como banco de dados.
+
+O projeto possui duas interfaces:
+
+- **Aplicação Console** (`estoque_farmacia`) — versão original em terminal.
+- **Aplicação Windows Forms** (`estoque_farmacia_winforms`) — interface gráfica desktop com login, menu e cadastros.
+
+Ambas compartilham os mesmos Models, Services e DbContext.
 
 ## Pré-requisitos
 
@@ -8,15 +15,12 @@ Antes de começar, certifique-se de ter instalado:
 
 - **.NET 10.0 SDK** ou superior
   - Download: [https://dotnet.microsoft.com/download](https://dotnet.microsoft.com/download)
-  
-- **SQL Server Express** (ou versão completa do SQL Server)
-  - Download: [https://www.microsoft.com/pt-br/sql-server/sql-server-downloads](https://www.microsoft.com/pt-br/sql-server/sql-server-downloads)
-  - Durante a instalação, use a instância padrão: `SQLEXPRESS`
-  - Ative "Autenticação do Windows (Trusted Connection)"
 
-- **SQL Server Management Studio (SSMS)** - Opcional, mas recomendado
-  - Para gerenciar e visualizar o banco de dados
-  - Download: [https://docs.microsoft.com/pt-br/sql/ssms/download-sql-server-management-studio-ssms](https://docs.microsoft.com/pt-br/sql/ssms/download-sql-server-management-studio-ssms)
+- **PostgreSQL 17** (ou versão superior)
+  - Download: [https://www.postgresql.org/download/](https://www.postgresql.org/download/)
+  - Durante a instalação, anote a senha do usuário `postgres` e a porta (padrão `5432`).
+
+- **pgAdmin** (opcional) — interface gráfica para administrar o PostgreSQL.
 
 ## Instalação
 
@@ -24,126 +28,135 @@ Antes de começar, certifique-se de ter instalado:
 
 ```bash
 git clone https://github.com/pimIII/pimIII.git
-cd pimIII/backend/c_sharp/estoque_farmacia
+cd pimIII/backend/c_sharp
 ```
 
-### 2. Restaurar dependências
+### 2. Criar o banco de dados
+
+Pelo `psql` ou pelo pgAdmin, execute:
+
+```sql
+CREATE DATABASE estoque_farmacia;
+```
+
+### 3. Ajustar a connection string
+
+Edite `estoque_farmacia/appsettings.json` com o usuário, senha e porta usados na instalação:
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Port=5432;Database=estoque_farmacia;Username=postgres;Password=SUA_SENHA"
+  }
+}
+```
+
+### 4. Restaurar dependências e aplicar migrations
 
 ```bash
+cd estoque_farmacia
 dotnet restore
-```
-
-### 3. Configurar o banco de dados
-
-O projeto utiliza Entity Framework Core com migrações automáticas. Para criar o banco de dados:
-
-```bash
 dotnet ef database update
 ```
 
-Isso criará automaticamente:
-- Banco de dados: `EstoqueFarmacia`
-- Tabelas: `Funcionarios`, `Produtos`, `Fornecedores`
+Isso criará as tabelas `Funcionarios`, `Produtos`, `Fornecedores` e `__EFMigrationsHistory` dentro do banco `estoque_farmacia`.
 
-**Verificação (opcional):**
-Se tiver SQL Server Management Studio instalado, conecte-se a `.\SQLEXPRESS` e verifique se a base de dados `EstoqueFarmacia` foi criada.
+## Executando a aplicação
 
-## Executando a Aplicação
-
-### Via linha de comando
+### Aplicação Console
 
 ```bash
+cd estoque_farmacia
 dotnet run
 ```
 
-### Credenciais padrão
-
-- **Login:** `admin`
-- **Senha:** `123`
-
-## Compilando um Executável
-
-Para criar um arquivo executável standalone que pode ser distribuído:
+### Aplicação Windows Forms
 
 ```bash
+cd estoque_farmacia_winforms
+dotnet run
+```
+
+### Credenciais padrão (login)
+
+- **Usuário:** `admin`
+- **Senha:** `123`
+
+## Compilando um executável
+
+```bash
+# Console
+cd estoque_farmacia
+dotnet publish -c Release -o ./publish
+
+# Windows Forms
+cd estoque_farmacia_winforms
 dotnet publish -c Release -o ./publish
 ```
 
-O executável estará em: `./publish/estoque_farmacia.exe`
-
-## Estrutura do Projeto
+## Estrutura do projeto
 
 ```
-estoque_farmacia/
-├── Models/              # Classes de domínio
-│   ├── Funcionario.cs
-│   ├── Produto.cs
-│   └── Fornecedor.cs
-├── Services/            # Lógica de negócio
-│   ├── FuncionarioService.cs
-│   ├── ProdutoService.cs
-│   └── FornecedorService.cs
-├── UI/                  # Interface do usuário (console)
-│   ├── Menu.cs
-│   ├── FuncionarioUI.cs
-│   ├── ProdutoUI.cs
-│   └── FornecedorUI.cs
-├── Data/                # Camada de dados (EF Core)
-│   ├── AppDbContext.cs
-│   └── AppDbContextFactory.cs
-├── Migrations/          # Histórico de migrações do banco
-├── Program.cs           # Ponto de entrada
-├── appsettings.json     # Configurações (connection string)
-└── estoque_farmacia.csproj
+backend/c_sharp/
+├── estoque_farmacia/                    # Projeto Console (.NET 10)
+│   ├── Models/                          # Classes de domínio
+│   ├── Services/                        # Regras de negócio + EF Core
+│   ├── UI/                              # Telas em texto (Console)
+│   ├── Data/                            # AppDbContext + Factory
+│   ├── Migrations/                      # Migrations do EF Core
+│   ├── Program.cs                       # Ponto de entrada
+│   ├── appsettings.json                 # Connection string
+│   └── estoque_farmacia.csproj
+└── estoque_farmacia_winforms/           # Projeto Windows Forms (.NET 10)
+    ├── Forms/                           # Telas (Login, Menu, CRUDs, Venda)
+    ├── UIHelper.cs                      # Paleta de cores
+    ├── Program.cs                       # Ponto de entrada
+    └── estoque_farmacia_winforms.csproj # Reaproveita Models/Services via Link
 ```
 
 ## Funcionalidades
 
-- **Controle de Funcionários**
-  - Cadastro, listagem, atualização e inativação de funcionários
-  - Persistência no banco de dados via EF Core
+- **Login** com usuário e senha.
+- **Cadastro de Produtos** com validação de preço e indicador de receita.
+- **Cadastro de Funcionários** com hash de senha (SHA-256) e inativação.
+- **Cadastro de Fornecedores** (nome, CNPJ, telefone).
+- **Registro de Vendas** com carrinho, desconto e total automático.
 
-- **Controle de Produtos**
-  - Gerenciamento de produtos do estoque
-  - Associação com fornecedores
+## Tecnologias utilizadas
 
-- **Controle de Fornecedores**
-  - Cadastro e gerenciamento de fornecedores
+- **.NET 10.0** — Plataforma
+- **C#** — Linguagem
+- **Windows Forms** — Interface desktop
+- **Entity Framework Core 10.0.4** — ORM
+- **Npgsql.EntityFrameworkCore.PostgreSQL 10.0.1** — Provedor PostgreSQL
+- **Microsoft.Extensions.DependencyInjection** — Injeção de dependência
 
-- **Controle de Vendas**
-  - Módulo em desenvolvimento
+## Solução de problemas
 
-## Tecnologias Utilizadas
+### Erro: "57P03 - the database system is starting up" ou conexão recusada
 
-- **.NET 10.0** - Framework
-- **C#** - Linguagem de programação
-- **Entity Framework Core 10.0.0** - ORM para acesso a dados
-- **SQL Server** - Banco de dados
-- **Dependency Injection** - Padrão de injeção de dependências
+**Causa:** o serviço do PostgreSQL não está rodando.
 
-## Solução de Problemas
+**Solução:** abra o gerenciador de serviços do Windows (`services.msc`) e inicie o serviço `postgresql-x64-17` (ou a versão equivalente).
 
-### Erro: "Erro ao Localizar Servidor/Instância Especificado"
+### Erro: "28P01 - password authentication failed"
 
-**Causa:** SQL Server não está instalado ou não está rodando.
+**Causa:** usuário ou senha incorretos na connection string.
 
-**Solução:**
-1. Instale SQL Server Express
-2. Inicie o serviço SQL Server:
-   - Windows: Abra "Serviços" (services.msc) e procure por "SQL Server (SQLEXPRESS)"
-   - Clique com botão direito → Iniciar
-
-### Erro: "The process cannot access the file"
-
-**Causa:** A aplicação está aberta e bloqueando a recompilação.
-
-**Solução:** Feche a aplicação antes de compilar novamente.
+**Solução:** atualizar `appsettings.json` com a senha definida na instalação do PostgreSQL.
 
 ### Erro: "Database does not exist"
 
-**Causa:** Migrations não foram aplicadas.
+**Causa:** o banco `estoque_farmacia` ainda não foi criado.
 
 **Solução:**
+
+```sql
+CREATE DATABASE estoque_farmacia;
+```
+
+E em seguida:
+
 ```bash
 dotnet ef database update
 ```

@@ -1,8 +1,8 @@
-# 📋 GUIA EDUCATIVO - MÓDULO DE FUNCIONÁRIOS
+﻿#  GUIA EDUCATIVO - MÓDULO DE FUNCIONÁRIOS
 
 ---
 
-## 📚 ÍNDICE
+##  ÍNDICE
 1. [Visão Geral](#visão-geral)
 2. [Arquitetura em Camadas](#arquitetura-em-camadas)
 3. [Estrutura das Classes](#estrutura-das-classes)
@@ -12,23 +12,23 @@
 
 ---
 
-## 🎯 VISÃO GERAL
+##  VISÃO GERAL
 
 Este módulo implementa o gerenciamento completo de **Funcionários** da farmácia usando o padrão de **3 camadas**:
 
 ```
 USUÁRIO
-  ↓
-[UI] FuncionarioUI.cs ← O que o usuário VÊ (menus, formulários)
-  ↓
-[SERVICE] FuncionarioService.cs ← A LÓGICA de negócio (CRUD, validações)
-  ↓
-[MODEL] Funcionario.cs ← A ESTRUTURA dos dados (propriedades)
+  
+[UI] FuncionarioUI.cs  O que o usuário VÊ (menus, formulários)
+  
+[SERVICE] FuncionarioService.cs  A LÓGICA de negócio (CRUD, validações)
+  
+[MODEL] Funcionario.cs  A ESTRUTURA dos dados (propriedades)
 ```
 
 ---
 
-## 🏗️ ARQUITETURA EM CAMADAS
+## ️ ARQUITETURA EM CAMADAS
 
 ### Por que 3 camadas?
 
@@ -41,7 +41,7 @@ USUÁRIO
 | **UI** | `FuncionarioUI.cs` | Define APRESENTAÇÃO | Como mostrar menus? Como pedir dados ao usuário? |
 
 ### Vantagem 1: Manutenção Fácil
-Se você quer mudar **como mostra** os funcionários (console → Web),
+Se você quer mudar **como mostra** os funcionários (console  Web),
 muda APENAS a UI. Service e Model continuam os mesmos!
 
 ### Vantagem 2: Testabilidade
@@ -55,7 +55,7 @@ O mesmo Service pode ser usado em:
 
 ---
 
-## 📦 ESTRUTURA DAS CLASSES
+##  ESTRUTURA DAS CLASSES
 
 ### 1️⃣ MODEL: Funcionario.cs
 
@@ -76,7 +76,7 @@ public DateTime? DataDemissao { get; set; } // Quando saiu (pode ser vazio)
 **Get/Set?**
 ```csharp
 public string Nome { get; set; }
-        ↑        ↑    ↑
+                    
       tipo      get  set
 
 get  = permite LER o valor
@@ -92,7 +92,7 @@ set  = permite ESCREVER o valor
 **Atributo:**
 ```csharp
 private readonly List<Funcionario> listaFuncionarios = new List<Funcionario>();
-         ↑        ↑                  ↑
+                                   
       privado  protegido         armazena
                                    dados
 ```
@@ -102,7 +102,7 @@ private readonly List<Funcionario> listaFuncionarios = new List<Funcionario>();
 
 **Métodos Principais:**
 
-#### ✅ SALVAR (CREATE)
+####  SALVAR (CREATE)
 ```csharp
 public bool Salvar(Funcionario novoFuncionario)
 ```
@@ -110,7 +110,7 @@ public bool Salvar(Funcionario novoFuncionario)
 - **Valida?** Sim! Verifica nome, CPF, duplicatas
 - **Retorna?** true (sucesso) ou false (erro)
 
-#### 📖 LISTAR (READ)
+####  LISTAR (READ)
 ```csharp
 public List<Funcionario> ListarTodos()
 public List<Funcionario> ListarAtivos()
@@ -119,21 +119,21 @@ public List<Funcionario> ListarAtivos()
 - `ListarTodos()` = todos (ativos + inativos)
 - `ListarAtivos()` = só quem está trabalhando
 
-#### 🔍 BUSCAR (READ ONE)
+####  BUSCAR (READ ONE)
 ```csharp
 public Funcionario BuscarPorId(int id)
 ```
 - **O que faz?** Encontra um funcionário específico pelo ID
 - **Retorna?** O funcionário (ou null se não encontrar)
 
-#### ✏️ ATUALIZAR (UPDATE)
+#### ️ ATUALIZAR (UPDATE)
 ```csharp
 public bool Atualizar(Funcionario funcionarioAtualizado)
 ```
 - **O que faz?** Muda os dados de um funcionário existente
 - **O que NÃO muda?** O ID (é fixo, único)
 
-#### ❌ INATIVAR/REMOVER (DELETE)
+####  INATIVAR/REMOVER (DELETE)
 ```csharp
 public bool Inativar(int id)   // Marca como inativo (recomendado)
 public bool Remover(int id)    // Remove totalmente (perigoso)
@@ -180,19 +180,19 @@ public void ProcessarMenuFuncionario()
 
 ---
 
-## 🔄 COMO FUNCIONA JUNTO
+##  COMO FUNCIONA JUNTO
 
 ### Fluxo: Cadastrar um Funcionário
 
 ```
 1. USUÁRIO escolhe opção "1" no menu
-           ↓
+           
 2. UI chama CadastrarFuncionario()
-           ↓
+           
 3. UI pede ao usuário: Nome, CPF, Cargo, Senha
-           ↓
+           
 4. UI VALIDA: não é nulo? está preenchido?
-           ↓
+           
 5. UI cria um NOVO Funcionario()
    {
      Nome = "João",
@@ -200,29 +200,29 @@ public void ProcessarMenuFuncionario()
      Cargo = "Farmacêutico",
      SenhaHash = "abc123xyz"
    }
-           ↓
+           
 6. UI chama: _funcionarioService.Salvar(novoFuncionario)
-           ↓
+           
 7. SERVICE:
-   ✓ Valida novamente (CPF já existe?)
-   ✓ Atribui ID único (próximo ID)
-   ✓ Define DataAdmissao = hoje
-   ✓ Define Ativo = true
-   ✓ Adiciona à lista
-   ✓ Incrementa próximo ID
-           ↓
+    Valida novamente (CPF já existe?)
+    Atribui ID único (próximo ID)
+    Define DataAdmissao = hoje
+    Define Ativo = true
+    Adiciona à lista
+    Incrementa próximo ID
+           
 8. SERVICE retorna true (sucesso)
-           ↓
-9. UI mostra: "✓ Funcionário 'João' salvo com sucesso! ID: 1"
-           ↓
+           
+9. UI mostra: " Funcionário 'João' salvo com sucesso! ID: 1"
+           
 10. UI aguarda Enter do usuário
-           ↓
+           
 11. Volta ao menu principal
 ```
 
 ---
 
-## 💡 CONCEITOS IMPORTANTES
+##  CONCEITOS IMPORTANTES
 
 ### 1. PROPERTIES (get; set;)
 
@@ -232,10 +232,10 @@ public string Nome { get; set; }
 
 **Segurança:**
 ```csharp
-// ❌ RUIM (variável pública)
+//  RUIM (variável pública)
 public string Nome;  // qualquer código pode mexer sem validação
 
-// ✅ BOM (property)
+//  BOM (property)
 public string Nome { get; set; }  // pode adicionar validação depois
 ```
 
@@ -262,7 +262,7 @@ public string Nome
 ```csharp
 // Filtrar apenas os ativos
 var ativos = listaFuncionarios.Where(f => f.Ativo == true).ToList();
-                                     ↑
+                                     
                             "para cada f em listaFuncionarios"
 
 // Contar quantos são ativos
@@ -339,13 +339,13 @@ else
 
 // Ternário (mais conciso):
 string status = funcionario.Ativo ? "Ativo" : "Inativo";
-                               ↑      ↑        ↑
+                                             
                           condição  true    false
 ```
 
 ---
 
-## 🚀 EXEMPLOS DE USO
+##  EXEMPLOS DE USO
 
 ### Exemplo 1: Criar e Salvar um Funcionário
 
@@ -407,7 +407,7 @@ service.Inativar(1); // marca como inativo, mas mantém no banco
 
 ---
 
-## 📝 RESUMO
+##  RESUMO
 
 | Coisa | Arquivo | Responsabilidade |
 |-------|---------|------------------|
@@ -415,13 +415,13 @@ service.Inativar(1); // marca como inativo, mas mantém no banco
 | **Service** | `FuncionarioService.cs` | CRUD + Validações |
 | **UI** | `FuncionarioUI.cs` | Menus + Interação com usuário |
 
-**Fluxo:** Usuário → UI → Service → Model → Lista em Memória
+**Fluxo:** Usuário  UI  Service  Model  Lista em Memória
 
 ---
 
-## 🎓 Próximos Passos (Para o Grupo)
+##  Próximos Passos (Para o Grupo)
 
-1. **Banco de Dados:** Conectar ao SQL Server (em vez de lista em memória)
+1. **Banco de Dados:** Conectar ao PostgreSQL (em vez de lista em memória)
 2. **ORM:** Usar Entity Framework para simplificar as queries
 3. **Validações:** Adicionar máscaras de CPF, validação de email, etc
 4. **Hash de Senha:** Usar BCrypt ou PBKDF2 para segurança real

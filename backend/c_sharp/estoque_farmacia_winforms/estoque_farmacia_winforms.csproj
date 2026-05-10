@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!--
+      OutputType WinExe = aplicacao desktop Windows (sem console).
+      UseWindowsForms = habilita o Windows Forms.
+      TargetFramework net10.0-windows = .NET 10 com APIs especificas do Windows.
+    -->
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>estoque_farmacia_winforms</RootNamespace>
+  </PropertyGroup>
+
+  <!--
+    Os arquivos de Models, Services e Data ficam no projeto console
+    (estoque_farmacia). Em vez de duplicar o codigo, o WinForms inclui
+    esses arquivos como "links". Assim, qualquer alteracao na regra
+    de negocio reflete nos dois aplicativos automaticamente.
+  -->
+  <ItemGroup>
+    <Compile Include="..\estoque_farmacia\Models\Funcionario.cs" Link="Models\Funcionario.cs" />
+    <Compile Include="..\estoque_farmacia\Models\Produto.cs" Link="Models\Produto.cs" />
+    <Compile Include="..\estoque_farmacia\Models\Fornecedor.cs" Link="Models\Fornecedor.cs" />
+    <Compile Include="..\estoque_farmacia\Models\Lote.cs" Link="Models\Lote.cs" />
+    <Compile Include="..\estoque_farmacia\Models\Venda.cs" Link="Models\Venda.cs" />
+    <Compile Include="..\estoque_farmacia\Data\AppDbContext.cs" Link="Data\AppDbContext.cs" />
+    <Compile Include="..\estoque_farmacia\Services\FuncionarioService.cs" Link="Services\FuncionarioService.cs" />
+    <Compile Include="..\estoque_farmacia\Services\ProdutoService.cs" Link="Services\ProdutoService.cs" />
+    <Compile Include="..\estoque_farmacia\Services\FornecedorService.cs" Link="Services\FornecedorService.cs" />
+  </ItemGroup>
+
+  <!-- Mesmos pacotes do projeto console, pois o WinForms tambem acessa o banco. -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.4" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.4" />
+  </ItemGroup>
+
+  <!-- Reutiliza o appsettings.json do projeto console (mesma string de conexao). -->
+  <ItemGroup>
+    <None Include="..\estoque_farmacia\appsettings.json" Link="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

@@ -14,11 +14,12 @@ var configuration = new ConfigurationBuilder()
 // Configurar injeção de dependências
 var services = new ServiceCollection();
 
-// Registrar DbContext
+// Registrar DbContext usando o provedor PostgreSQL (Npgsql).
+// A escolha de PostgreSQL atende ao requisito do manual do PIM III.
 services.AddDbContext<AppDbContext>(options =>
 {
     var connectionString = configuration.GetConnectionString("DefaultConnection");
-    options.UseSqlServer(connectionString);
+    options.UseNpgsql(connectionString);
 });
 
 // Registrar Services
@@ -54,7 +55,7 @@ catch (Exception ex)
 {
     Console.WriteLine($"ERRO ao inicializar aplicação: {ex.Message}");
     Console.WriteLine("\nVerifique se:");
-    Console.WriteLine("1. SQL Server está rodando");
-    Console.WriteLine("2. Connection string está correta");
-    Console.WriteLine("3. Database foi criado com migrations");
+    Console.WriteLine("1. PostgreSQL está rodando (serviço postgresql-x64-17)");
+    Console.WriteLine("2. Connection string em appsettings.json está correta");
+    Console.WriteLine("3. Banco de dados foi criado e migrations aplicadas (dotnet ef database update)");
 }

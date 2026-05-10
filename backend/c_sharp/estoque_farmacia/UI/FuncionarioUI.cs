@@ -202,7 +202,7 @@ public class FuncionarioUI
 
                 // OPÇÃO INVÁLIDA
                 default:
-                    Console.WriteLine("\n✗ Opção inválida! Tente novamente.");
+                    Console.WriteLine("\nOpção inválida! Tente novamente.");
                     Thread.Sleep(1500);
                     break;
             }
@@ -244,7 +244,7 @@ public class FuncionarioUI
             // VALIDAÇÃO SIMPLES
             if (string.IsNullOrWhiteSpace(nome))
             {
-                Console.WriteLine("\n✗ Nome não pode ser vazio!");
+                Console.WriteLine("\nNome não pode ser vazio!");
                 PauseMenu();
                 return; // volta sem fazer nada
             }
@@ -255,7 +255,7 @@ public class FuncionarioUI
 
             if (string.IsNullOrWhiteSpace(cpf))
             {
-                Console.WriteLine("\n✗ CPF não pode ser vazio!");
+                Console.WriteLine("\nCPF não pode ser vazio!");
                 PauseMenu();
                 return;
             }
@@ -266,7 +266,7 @@ public class FuncionarioUI
 
             if (string.IsNullOrWhiteSpace(cargo))
             {
-                Console.WriteLine("\n✗ Cargo não pode ser vazio!");
+                Console.WriteLine("\nCargo não pode ser vazio!");
                 PauseMenu();
                 return;
             }
@@ -277,7 +277,7 @@ public class FuncionarioUI
 
             if (string.IsNullOrWhiteSpace(senhaHash))
             {
-                Console.WriteLine("\n✗ Senha não pode ser vazia!");
+                Console.WriteLine("\nSenha não pode ser vazia!");
                 PauseMenu();
                 return;
             }
@@ -300,16 +300,16 @@ public class FuncionarioUI
 
             if (sucesso)
             {
-                Console.WriteLine("\n✓ Funcionário cadastrado com sucesso!");
+                Console.WriteLine("\nFuncionário cadastrado com sucesso!");
             }
             else
             {
-                Console.WriteLine("\n✗ Erro ao cadastrar funcionário!");
+                Console.WriteLine("\nErro ao cadastrar funcionário!");
             }
         }
         catch (Exception ex) // se acontecer um erro
         {
-            Console.WriteLine($"\n✗ Erro: {ex.Message}");
+            Console.WriteLine($"\nErro: {ex.Message}");
         }
 
         PauseMenu(); // aguarda Enter do usuário
@@ -379,7 +379,7 @@ public class FuncionarioUI
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"\n✗ Erro: {ex.Message}");
+            Console.WriteLine($"\nErro: {ex.Message}");
         }
 
         PauseMenu();
@@ -415,7 +415,7 @@ public class FuncionarioUI
             // Exemplo: "5" → 5 (sucesso), "abc" → erro
             if (!int.TryParse(Console.ReadLine(), out int id))
             {
-                Console.WriteLine("\n✗ ID inválido!");
+                Console.WriteLine("\nID inválido!");
                 PauseMenu();
                 return;
             }
@@ -442,12 +442,12 @@ public class FuncionarioUI
             }
             else
             {
-                Console.WriteLine($"\n✗ Funcionário com ID {id} não encontrado!");
+                Console.WriteLine($"\nFuncionário com ID {id} não encontrado!");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"\n✗ Erro: {ex.Message}");
+            Console.WriteLine($"\nErro: {ex.Message}");
         }
 
         PauseMenu();
@@ -480,7 +480,7 @@ public class FuncionarioUI
             Console.Write("Digite o ID do funcionário a atualizar: ");
             if (!int.TryParse(Console.ReadLine(), out int id))
             {
-                Console.WriteLine("\n✗ ID inválido!");
+                Console.WriteLine("\nID inválido!");
                 PauseMenu();
                 return;
             }
@@ -490,7 +490,7 @@ public class FuncionarioUI
 
             if (funcExistente == null)
             {
-                Console.WriteLine($"\n✗ Funcionário com ID {id} não encontrado!");
+                Console.WriteLine($"\nFuncionário com ID {id} não encontrado!");
                 PauseMenu();
                 return;
             }
@@ -524,12 +524,12 @@ public class FuncionarioUI
 
             if (!sucesso)
             {
-                Console.WriteLine("\n✗ Erro ao atualizar!");
+                Console.WriteLine("\nErro ao atualizar!");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"\n✗ Erro: {ex.Message}");
+            Console.WriteLine($"\nErro: {ex.Message}");
         }
 
         PauseMenu();
@@ -564,7 +564,7 @@ public class FuncionarioUI
             Console.Write("Digite o ID do funcionário a inativar: ");
             if (!int.TryParse(Console.ReadLine(), out int id))
             {
-                Console.WriteLine("\n✗ ID inválido!");
+                Console.WriteLine("\nID inválido!");
                 PauseMenu();
                 return;
             }
@@ -573,7 +573,7 @@ public class FuncionarioUI
             Funcionario func = _funcionarioService.BuscarPorId(id);
             if (func == null)
             {
-                Console.WriteLine($"\n✗ Funcionário com ID {id} não encontrado!");
+                Console.WriteLine($"\nFuncionário com ID {id} não encontrado!");
                 PauseMenu();
                 return;
             }
@@ -595,12 +595,12 @@ public class FuncionarioUI
 
             if (!sucesso)
             {
-                Console.WriteLine("\n✗ Erro ao inativar!");
+                Console.WriteLine("\nErro ao inativar!");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"\n✗ Erro: {ex.Message}");
+            Console.WriteLine($"\nErro: {ex.Message}");
         }
 
         PauseMenu();

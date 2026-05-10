@@ -1,4 +1,4 @@
-# REQUISITOS E ESPECIFICAÇÕES DO SISTEMA
+﻿# REQUISITOS E ESPECIFICAÇÕES DO SISTEMA
 ## Sistema de Gerenciamento de Estoque de Farmácia - PIM III
 
 ---
@@ -373,7 +373,7 @@ Prioridade: ALTA
 
 ### 3.5 RNF05 - Banco de Dados
 
-- SGBD: SQL Server (ou PostgreSQL)
+- SGBD: PostgreSQL (ou PostgreSQL)
 - Normalização: Até 3ª forma normal
 - Backup: Automático diariamente
 - Capacidade: Suportar mínimo 100.000 registros
