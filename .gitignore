@@ -1,6 +1,7 @@
 # Pastas de compilação (Arquivos que o dotnet gera ao rodar o código)
 [Bb]in/
 [Oo]bj/
+publish/
 
 # Arquivos de configuração do VS Code e Visual Studio
 .vscode/
