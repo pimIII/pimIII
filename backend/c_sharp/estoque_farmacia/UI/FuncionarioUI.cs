@@ -106,17 +106,29 @@ public class FuncionarioUI
     /// </summary>
     public static void MostrarMenu()
     {
-        Console.Clear(); // limpa a tela
+        Console.Clear();
+
+        Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("\n╔══════════════════════════════════════╗");
-        Console.WriteLine("║    CONTROLE DE FUNCIONÁRIOS        ║");
+        Console.WriteLine("║   👥 CONTROLE DE FUNCIONÁRIOS 👥   ║");
         Console.WriteLine("╚══════════════════════════════════════╝\n");
-        Console.WriteLine("1 - Cadastrar novo funcionário");
-        Console.WriteLine("2 - Listar todos os funcionários");
-        Console.WriteLine("3 - Buscar funcionário por ID");
-        Console.WriteLine("4 - Atualizar funcionário");
-        Console.WriteLine("5 - Inativar funcionário");
-        Console.WriteLine("6 - Voltar\n");
-        Console.Write("Escolha uma opção: ");
+
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("  1 ➕ Cadastrar novo funcionário");
+        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.WriteLine("  2 📋 Listar todos os funcionários");
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("  3 🔍 Buscar funcionário por ID");
+        Console.ForegroundColor = ConsoleColor.Magenta;
+        Console.WriteLine("  4 ✏️  Atualizar funcionário");
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("  5 🚫 Inativar funcionário");
+        Console.ForegroundColor = ConsoleColor.Gray;
+        Console.WriteLine("  6 ↩️  Voltar\n");
+
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.Write("➜ Escolha uma opção: ");
+        Console.ResetColor();
     }
 
     // ========================================================================
