@@ -16,7 +16,7 @@ values
 ('Carlos Silva', '11111111111', 'Gerente', 'carlos@empresa.com', '123', '2023-01-10', 'G');
 
 -- Integridade Referencial (Foreign Keys)
--- Regra abaixo na tabela Produto
+-- Regra (CONSTRAINT) abaixo na tabela Produto
 -- foreign key (id_categoria) references categoria (id) ON DELETE RESTRICT 
 
 delete from categoria where nome = 'Primeiros Socorros'; 

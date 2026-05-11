@@ -10,7 +10,7 @@ SELECT p.codigo AS cod_produto,
   FROM lote l
  INNER JOIN produto p
     ON l.id_produto = p.id
- WHERE l.validade BETWEEN CURRENT_DATE AND (CURRENT_DATE + INTERVAL '30 days')
+ WHERE l.validade BETWEEN CURRENT_DATE AND (CURRENT_DATE + INTERVAL '30 days') -- data atual somando mais 30 dias
  ORDER BY l.validade ASC,
           p.nome     ASC;
 		  

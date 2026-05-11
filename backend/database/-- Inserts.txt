@@ -1,3 +1,9 @@
+/*Observação:
+Os scripts abaixo foram gerados via IA (ChatGPT) com o objetivo de realizar inserções em massa. 
+Essa escolha foi para otimizar o tempo e preencher o banco com dados realistas, tornando o cenário do projeto um pouco mais real
+O responsável do banco sabe a utilidade do comando e como usar o mesmo.*/
+-- link do comando utilizado: https://chatgpt.com/share/6a010add-0f70-83e9-b0ef-617941695413
+
 -- =========================
 -- INSERT FORNECEDOR
 -- =========================
