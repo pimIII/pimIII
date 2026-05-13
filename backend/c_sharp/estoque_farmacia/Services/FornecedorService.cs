@@ -1,20 +1,14 @@
-﻿using estoque_farmacia.Models;
-using estoque_farmacia.Data;
-using System.Collections.Generic;
-using System.Linq;
+using estoque_farmacia.Models;
 
 namespace estoque_farmacia.Services;
 
 public class FornecedorService
 {
+    private static readonly object Sync = new();
+    private static readonly List<Fornecedor> Itens = new();
+    private static int _nextId = 1;
+
     public string UltimoErro { get; private set; } = string.Empty;
-
-    private readonly AppDbContext context;
-
-    public FornecedorService(AppDbContext context)
-    {
-        this.context = context;
-    }
 
     public bool Salvar(Fornecedor novoFornecedor)
     {
@@ -26,18 +20,16 @@ public class FornecedorService
                 return false;
             }
 
-            context.Fornecedores.Add(novoFornecedor);
-            int registros = context.SaveChanges();
-
-            if (registros > 0)
+            lock (Sync)
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"\n  Fornecedor '{novoFornecedor.NomeEmpresa}' salvo com sucesso! ID: {novoFornecedor.Id}");
-                Console.ResetColor();
-                return true;
+                novoFornecedor.Id = _nextId++;
+                Itens.Add(novoFornecedor);
             }
 
-            return false;
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"\n  Fornecedor '{novoFornecedor.NomeEmpresa}' salvo com sucesso! ID: {novoFornecedor.Id}");
+            Console.ResetColor();
+            return true;
         }
         catch (Exception ex)
         {
@@ -50,23 +42,25 @@ public class FornecedorService
 
     public List<Fornecedor> ListarTodos()
     {
-        return context.Fornecedores.ToList();
+        lock (Sync) return Itens.ToList();
     }
 
-    public Fornecedor BuscarPorId(int id)
+    public Fornecedor? BuscarPorId(int id)
     {
-        return context.Fornecedores.FirstOrDefault(f => f.Id == id);
+        lock (Sync) return Itens.FirstOrDefault(f => f.Id == id);
     }
 
     public bool Remover(int id)
     {
         try
         {
-            var fornecedor = context.Fornecedores.FirstOrDefault(f => f.Id == id);
-            if (fornecedor == null) return false;
+            lock (Sync)
+            {
+                var f = Itens.FirstOrDefault(x => x.Id == id);
+                if (f == null) return false;
+                Itens.Remove(f);
+            }
 
-            context.Fornecedores.Remove(fornecedor);
-            context.SaveChanges();
             return true;
         }
         catch (Exception ex)

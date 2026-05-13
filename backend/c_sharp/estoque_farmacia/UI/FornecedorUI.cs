@@ -12,9 +12,6 @@ public class FornecedorUI
         _fornecedorService = fornecedorService;
     }
 
-    /// <summary>
-    /// Exibe o menu de operações relacionadas a fornecedores.
-    /// </summary>
 
     public void MostrarMenuFornecedor() {
         Console.WriteLine("\n");
@@ -30,9 +27,6 @@ public class FornecedorUI
         Console.Write("\n");
         }
 
-    /// <summary>
-    /// Loop que processa as opções do menu de fornecedor até o usuário retornar.
-    /// </summary>
     public void ProcessarMenuFornecedor()
     {
         bool continuar = true;
@@ -96,9 +90,6 @@ public class FornecedorUI
 
 
 
-    /// <summary>
-    /// Lê os dados do fornecedor no console e registra um novo fornecedor.
-    /// </summary>
     public void ObterDadosFornecedor()
     {
         Console.Write("\n");
@@ -124,9 +115,6 @@ public class FornecedorUI
     }
 
 
-    /// <summary>
-    /// Solicita o ID do fornecedor e tenta removê-lo da lista.
-    /// </summary>
     public void RemoverFornecedor()
     {
         Console.Write("Digite o ID do fornecedor a ser removido: ");

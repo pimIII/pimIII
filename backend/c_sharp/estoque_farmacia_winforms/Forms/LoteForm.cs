@@ -1,23 +1,22 @@
 using System.Drawing;
-using System.Security.Cryptography;
-using System.Text;
+using System.Globalization;
 using System.Windows.Forms;
 using estoque_farmacia.Models;
 using estoque_farmacia.Services;
 
 namespace estoque_farmacia_winforms.Forms;
 
-public class FuncionarioForm : Form
+public class LoteForm : Form
 {
-    private readonly FuncionarioService _service;
+    private readonly LoteService _service;
 
-    private readonly TextBox _txtNome = new();
-    private readonly TextBox _txtCpf = new();
-    private readonly TextBox _txtCargo = new();
-    private readonly TextBox _txtSenha = new();
+    private readonly TextBox _txtIdProduto = new();
+    private readonly TextBox _txtNumeroLote = new();
+    private readonly DateTimePicker _dtpValidade = new();
+    private readonly TextBox _txtQuantidade = new();
     private readonly DataGridView _grid = new();
 
-    public FuncionarioForm(FuncionarioService service)
+    public LoteForm(LoteService service)
     {
         _service = service;
         ConfigurarJanela();
@@ -27,8 +26,8 @@ public class FuncionarioForm : Form
 
     private void ConfigurarJanela()
     {
-        Text = "Cadastro de Funcionarios";
-        Size = new Size(950, 580);
+        Text = "Cadastro de Lotes";
+        Size = new Size(950, 560);
         StartPosition = FormStartPosition.CenterParent;
         BackColor = UIHelper.CorFundo;
         Font = new Font("Segoe UI", 9F);
@@ -39,7 +38,7 @@ public class FuncionarioForm : Form
         var topo = new Panel { Dock = DockStyle.Top, Height = 60, BackColor = UIHelper.CorPrimaria };
         var lbl = new Label
         {
-            Text = "Funcionarios",
+            Text = "Lotes",
             ForeColor = Color.White,
             Font = new Font("Segoe UI", 14F, FontStyle.Bold),
             AutoSize = true,
@@ -51,33 +50,33 @@ public class FuncionarioForm : Form
         var painelForm = new Panel
         {
             Location = new Point(20, 80),
-            Size = new Size(320, 460),
+            Size = new Size(320, 440),
             BackColor = Color.White,
             BorderStyle = BorderStyle.FixedSingle
         };
 
         int y = 20;
-        AdicionarCampo(painelForm, "Nome completo", _txtNome, ref y);
-        AdicionarCampo(painelForm, "CPF (formato 000.000.000-00)", _txtCpf, ref y);
-        AdicionarCampo(painelForm, "Cargo", _txtCargo, ref y);
+        AdicionarCampo(painelForm, "ID do produto", _txtIdProduto, ref y);
+        AdicionarCampo(painelForm, "Numero do lote (inteiro)", _txtNumeroLote, ref y);
 
-        var lblSenha = new Label
+        var lblVal = new Label
         {
-            Text = "Senha",
+            Text = "Validade",
             Location = new Point(20, y),
             AutoSize = true,
             Font = new Font("Segoe UI", 9F, FontStyle.Bold),
             ForeColor = UIHelper.CorTexto
         };
-        painelForm.Controls.Add(lblSenha);
+        painelForm.Controls.Add(lblVal);
         y += 22;
 
-        _txtSenha.Location = new Point(20, y);
-        _txtSenha.Size = new Size(280, 26);
-        _txtSenha.UseSystemPasswordChar = true; // esconde os caracteres
-        UIHelper.EstilizarCampo(_txtSenha);
-        painelForm.Controls.Add(_txtSenha);
-        y += 50;
+        _dtpValidade.Location = new Point(20, y);
+        _dtpValidade.Size = new Size(280, 26);
+        _dtpValidade.Format = DateTimePickerFormat.Short;
+        painelForm.Controls.Add(_dtpValidade);
+        y += 40;
+
+        AdicionarCampo(painelForm, "Quantidade (ex.: 10 ou 10,5)", _txtQuantidade, ref y);
 
         var btnSalvar = new Button { Text = "Salvar", Location = new Point(20, y), Size = new Size(140, 38) };
         UIHelper.EstilizarBotaoPrimario(btnSalvar);
@@ -94,13 +93,13 @@ public class FuncionarioForm : Form
         var painelGrid = new Panel
         {
             Location = new Point(360, 80),
-            Size = new Size(560, 460),
+            Size = new Size(560, 440),
             BackColor = Color.White,
             BorderStyle = BorderStyle.FixedSingle
         };
 
         _grid.Location = new Point(10, 10);
-        _grid.Size = new Size(540, 400);
+        _grid.Size = new Size(540, 375);
         _grid.AllowUserToAddRows = false;
         _grid.ReadOnly = true;
         _grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
@@ -109,16 +108,16 @@ public class FuncionarioForm : Form
         _grid.BackgroundColor = Color.White;
         _grid.RowHeadersVisible = false;
 
-        var btnInativar = new Button { Text = "Inativar selecionado", Location = new Point(10, 415), Size = new Size(200, 35) };
-        UIHelper.EstilizarBotaoPerigo(btnInativar);
-        btnInativar.Click += BotaoInativar_Click;
+        var btnRemover = new Button { Text = "Remover selecionado", Location = new Point(10, 390), Size = new Size(200, 35) };
+        UIHelper.EstilizarBotaoPerigo(btnRemover);
+        btnRemover.Click += BotaoRemover_Click;
 
-        var btnAtualizar = new Button { Text = "Atualizar lista", Location = new Point(220, 415), Size = new Size(150, 35) };
+        var btnAtualizar = new Button { Text = "Atualizar lista", Location = new Point(220, 390), Size = new Size(150, 35) };
         UIHelper.EstilizarBotaoSecundario(btnAtualizar);
         btnAtualizar.Click += (_, _) => CarregarDados();
 
         painelGrid.Controls.Add(_grid);
-        painelGrid.Controls.Add(btnInativar);
+        painelGrid.Controls.Add(btnRemover);
         painelGrid.Controls.Add(btnAtualizar);
         Controls.Add(painelGrid);
     }
@@ -143,14 +142,6 @@ public class FuncionarioForm : Form
         y += 40;
     }
 
-    private static string GerarHashSenha(string senha)
-    {
-        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(senha));
-        var sb = new StringBuilder();
-        foreach (var b in bytes) sb.Append(b.ToString("x2"));
-        return sb.ToString();
-    }
-
     private void CarregarDados()
     {
         var lista = _service.ListarTodos();
@@ -158,73 +149,65 @@ public class FuncionarioForm : Form
         _grid.Columns.Clear();
         _grid.Rows.Clear();
         _grid.Columns.Add("Id", "ID");
-        _grid.Columns.Add("Nome", "Nome");
-        _grid.Columns.Add("Cpf", "CPF");
-        _grid.Columns.Add("Cargo", "Cargo");
-        _grid.Columns.Add("Ativo", "Ativo");
-        _grid.Columns.Add("Admissao", "Admissao");
+        _grid.Columns.Add("IdProduto", "ID Produto");
+        _grid.Columns.Add("NumeroLote", "N. lote");
+        _grid.Columns.Add("Validade", "Validade");
+        _grid.Columns.Add("Quantidade", "Qtd");
 
-        foreach (var f in lista)
+        foreach (var l in lista)
         {
             _grid.Rows.Add(
-                f.Id,
-                f.Nome,
-                f.CPF,
-                f.Cargo,
-                f.Ativo ? "Sim" : "Nao",
-                f.DataAdmissao.ToString("dd/MM/yyyy"));
+                l.Id,
+                l.IdProduto,
+                l.NumeroLote,
+                l.Validade.ToString("dd/MM/yyyy"),
+                l.Quantidade.ToString("F2", CultureInfo.GetCultureInfo("pt-BR")));
         }
     }
 
     private void BotaoSalvar_Click(object? sender, EventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(_txtNome.Text))
+        if (!int.TryParse(_txtIdProduto.Text.Trim(), out int idProduto) || idProduto <= 0)
         {
-            MessageBox.Show("Informe o nome.", "Atencao", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
-        }
-        if (string.IsNullOrWhiteSpace(_txtCpf.Text))
-        {
-            MessageBox.Show("Informe o CPF.", "Atencao", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
-        }
-        if (string.IsNullOrWhiteSpace(_txtCargo.Text))
-        {
-            MessageBox.Show("Informe o cargo.", "Atencao", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
-        }
-        if (string.IsNullOrEmpty(_txtSenha.Text) || _txtSenha.Text.Length < 4)
-        {
-            MessageBox.Show("Senha deve ter ao menos 4 caracteres.", "Atencao", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Informe um ID de produto valido (inteiro maior que zero).", "Atencao", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
-        var novo = new Funcionario
+        if (!int.TryParse(_txtNumeroLote.Text.Trim(), out int numeroLote) || numeroLote <= 0)
         {
-            Nome = _txtNome.Text.Trim(),
-            CPF = _txtCpf.Text.Trim(),
-            Cargo = _txtCargo.Text.Trim(),
-            SenhaHash = GerarHashSenha(_txtSenha.Text),
-            DataAdmissao = DateTime.Now,
-            Ativo = true
+            MessageBox.Show("Informe o numero do lote (inteiro maior que zero).", "Atencao", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
+        var cultura = CultureInfo.GetCultureInfo("pt-BR");
+        if (!decimal.TryParse(_txtQuantidade.Text.Trim(), cultura, out decimal quantidade) || quantidade <= 0)
+        {
+            MessageBox.Show("Informe a quantidade (maior que zero; use virgula para decimais).", "Atencao", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
+        var novo = new Lote
+        {
+            IdProduto = idProduto,
+            NumeroLote = numeroLote,
+            Validade = _dtpValidade.Value.Date,
+            Quantidade = decimal.Round(quantidade, 2)
         };
 
         if (_service.Salvar(novo))
         {
-            MessageBox.Show("Funcionario salvo.", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Lote salvo.", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
             LimparCampos();
             CarregarDados();
         }
         else
         {
-            // Mostra o motivo real exposto pelo service.
             var motivo = string.IsNullOrEmpty(_service.UltimoErro) ? "motivo desconhecido" : _service.UltimoErro;
             MessageBox.Show("Nao foi possivel salvar.\n\n" + motivo, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
-    // SelectedRows pode ficar vazio apos recarregar; CurrentRow costuma indicar a linha em foco.
-    private DataGridViewRow? ObterLinhaFuncionarioParaAcao()
+    private DataGridViewRow? ObterLinhaSelecionada()
     {
         if (_grid.SelectedRows.Count > 0)
             return _grid.SelectedRows[0];
@@ -236,40 +219,41 @@ public class FuncionarioForm : Form
         return null;
     }
 
-    private void BotaoInativar_Click(object? sender, EventArgs e)
+    private void BotaoRemover_Click(object? sender, EventArgs e)
     {
-        var linha = ObterLinhaFuncionarioParaAcao();
+        var linha = ObterLinhaSelecionada();
         if (linha == null)
         {
-            MessageBox.Show("Selecione um funcionario (clique na linha na tabela).", "Atencao", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Selecione um lote (clique na linha na tabela).", "Atencao", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
         var idCelula = linha.Cells["Id"].Value;
         if (idCelula == null || !int.TryParse(idCelula.ToString(), out int id) || id <= 0)
         {
-            MessageBox.Show("Nao foi possivel identificar o ID do funcionario.", "Atencao", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Nao foi possivel identificar o ID do lote.", "Atencao", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
-        if (MessageBox.Show($"Inativar funcionario ID {id}?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
 
-        if (_service.Inativar(id))
+        if (MessageBox.Show($"Remover lote ID {id}?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+
+        if (_service.Remover(id))
         {
             CarregarDados();
         }
         else
         {
-            var motivo = string.IsNullOrEmpty(_service.UltimoErro) ? "motivo desconhecido" : _service.UltimoErro;
-            MessageBox.Show("Nao foi possivel inativar.\n\n" + motivo, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            var motivo = string.IsNullOrEmpty(_service.UltimoErro) ? "Lote nao encontrado ou erro ao remover." : _service.UltimoErro;
+            MessageBox.Show("Nao foi possivel remover.\n\n" + motivo, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
     private void LimparCampos()
     {
-        _txtNome.Clear();
-        _txtCpf.Clear();
-        _txtCargo.Clear();
-        _txtSenha.Clear();
-        _txtNome.Focus();
+        _txtIdProduto.Clear();
+        _txtNumeroLote.Clear();
+        _dtpValidade.Value = DateTime.Today;
+        _txtQuantidade.Clear();
+        _txtIdProduto.Focus();
     }
 }

@@ -1,17 +1,9 @@
 using System.Drawing;
 using System.Windows.Forms;
-using Microsoft.Extensions.DependencyInjection;
+using estoque_farmacia.Services;
 
 namespace estoque_farmacia_winforms.Forms;
 
-/// <summary>
-/// MENU PRINCIPAL
-/// ==============
-///
-/// Tela inicial apos o login. Apresenta botoes que abrem cada modulo
-/// do sistema (cadastros e vendas). Cada botao instancia o Form
-/// correspondente via injecao de dependencia.
-/// </summary>
 public class MenuForm : Form
 {
     public MenuForm()
@@ -22,8 +14,8 @@ public class MenuForm : Form
 
     private void ConfigurarJanela()
     {
-        Text = "Menu Principal - FarmaSystem";
-        Size = new Size(780, 520);
+        Text = "Menu Principal - Pharmastock";
+        Size = new Size(780, 580);
         StartPosition = FormStartPosition.CenterScreen;
         BackColor = UIHelper.CorFundo;
         Font = new Font("Segoe UI", 9F);
@@ -48,31 +40,34 @@ public class MenuForm : Form
         };
         topo.Controls.Add(lblTitulo);
 
-        // Painel central com os botoes em grade 2x2.
+        // Painel central: grade 2x2 + linha extra para Lotes.
         var painelBotoes = new TableLayoutPanel
         {
             Location = new Point(40, 100),
-            Size = new Size(700, 350),
+            Size = new Size(700, 400),
             ColumnCount = 2,
-            RowCount = 2,
+            RowCount = 3,
             CellBorderStyle = TableLayoutPanelCellBorderStyle.None
         };
         painelBotoes.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
         painelBotoes.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
-        painelBotoes.RowStyles.Add(new RowStyle(SizeType.Percent, 50));
-        painelBotoes.RowStyles.Add(new RowStyle(SizeType.Percent, 50));
+        painelBotoes.RowStyles.Add(new RowStyle(SizeType.Percent, 33.33f));
+        painelBotoes.RowStyles.Add(new RowStyle(SizeType.Percent, 33.33f));
+        painelBotoes.RowStyles.Add(new RowStyle(SizeType.Percent, 33.34f));
 
-        // Cria os botoes principais. Cada um abre a respectiva tela.
         painelBotoes.Controls.Add(CriarBotaoMenu("Produtos", AbrirProdutos), 0, 0);
         painelBotoes.Controls.Add(CriarBotaoMenu("Funcionarios", AbrirFuncionarios), 1, 0);
         painelBotoes.Controls.Add(CriarBotaoMenu("Fornecedores", AbrirFornecedores), 0, 1);
         painelBotoes.Controls.Add(CriarBotaoMenu("Vendas", AbrirVendas), 1, 1);
+        var btnLotes = CriarBotaoMenu("Lotes", AbrirLotes);
+        painelBotoes.Controls.Add(btnLotes, 0, 2);
+        painelBotoes.SetColumnSpan(btnLotes, 2);
 
         // Botao "Sair" no rodape.
         var btnSair = new Button
         {
             Text = "Sair",
-            Location = new Point(640, 460),
+            Location = new Point(640, 520),
             Size = new Size(100, 32)
         };
         UIHelper.EstilizarBotaoSecundario(btnSair);
@@ -83,10 +78,6 @@ public class MenuForm : Form
         Controls.Add(btnSair);
     }
 
-    /// <summary>
-    /// Helper que cria um botao grande para o menu principal.
-    /// Recebe o texto e a acao a ser executada ao clicar.
-    /// </summary>
     private Button CriarBotaoMenu(string texto, EventHandler aoClicar)
     {
         var btn = new Button
@@ -112,25 +103,32 @@ public class MenuForm : Form
 
     private void AbrirProdutos(object? s, EventArgs e)
     {
-        using var f = Program.Services.GetRequiredService<ProdutoForm>();
+        using var f = new ProdutoForm(new ProdutoService());
         f.ShowDialog(this);
     }
 
     private void AbrirFuncionarios(object? s, EventArgs e)
     {
-        using var f = Program.Services.GetRequiredService<FuncionarioForm>();
+        using var f = new FuncionarioForm(new FuncionarioService());
         f.ShowDialog(this);
     }
 
     private void AbrirFornecedores(object? s, EventArgs e)
     {
-        using var f = Program.Services.GetRequiredService<FornecedorForm>();
+        using var f = new FornecedorForm(new FornecedorService());
         f.ShowDialog(this);
     }
 
     private void AbrirVendas(object? s, EventArgs e)
     {
-        using var f = Program.Services.GetRequiredService<VendaForm>();
+        using var f = new VendaForm(new ProdutoService());
+        f.ShowDialog(this);
+    }
+
+    private void AbrirLotes(object? s, EventArgs e)
+    {
+        var produtoService = new ProdutoService();
+        using var f = new LoteForm(new LoteService(produtoService));
         f.ShowDialog(this);
     }
 }

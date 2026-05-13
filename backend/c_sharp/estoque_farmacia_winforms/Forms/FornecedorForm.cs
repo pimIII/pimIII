@@ -5,13 +5,6 @@ using estoque_farmacia.Services;
 
 namespace estoque_farmacia_winforms.Forms;
 
-/// <summary>
-/// TELA DE CADASTRO DE FORNECEDORES
-/// =================================
-///
-/// Mesmo padrao da tela de Produtos: formulario a esquerda e tabela
-/// a direita. Os dados ficam no PostgreSQL via EF Core.
-/// </summary>
 public class FornecedorForm : Form
 {
     private readonly FornecedorService _service;

@@ -1,24 +1,11 @@
 using System.Drawing;
+using System.Globalization;
 using System.Windows.Forms;
 using estoque_farmacia.Models;
 using estoque_farmacia.Services;
 
 namespace estoque_farmacia_winforms.Forms;
 
-/// <summary>
-/// TELA DE VENDAS
-/// ==============
-///
-/// Permite registrar uma venda combinando produtos cadastrados.
-/// O atendente busca o produto, define a quantidade e adiciona ao carrinho.
-/// Ao final, o sistema mostra o total, aplica desconto opcional e
-/// confirma a venda.
-///
-/// O modulo nao persiste a venda em uma tabela propria (a tabela Venda
-/// fica para um proximo incremento). Esta tela serve como interface
-/// operacional, atendendo ao requisito de "implementacao completa de
-/// um caso de uso" exigido pela disciplina de Interface.
-/// </summary>
 public class VendaForm : Form
 {
     private readonly ProdutoService _produtoService;
@@ -30,17 +17,8 @@ public class VendaForm : Form
     private readonly Label _lblTotal = new();
     private readonly NumericUpDown _numDesconto = new();
 
-    /// <summary>
-    /// Lista que armazena os itens adicionados ao "carrinho" da venda.
-    /// Cada elemento e um ItemVenda contendo o produto e a quantidade.
-    /// </summary>
     private readonly List<ItemVenda> _carrinho = new();
 
-    /// <summary>
-    /// Cache de produtos cadastrados. Carregado uma vez ao abrir a tela
-    /// para que a busca por nome/ID seja feita em memoria, sem ir ao banco
-    /// a cada digitacao.
-    /// </summary>
     private List<Produto> _produtos = new();
 
     public VendaForm(ProdutoService produtoService)
@@ -87,7 +65,7 @@ public class VendaForm : Form
 
         var lblBusca = new Label
         {
-            Text = "Produto (ID ou nome)",
+            Text = "Produto (ID, cod. barras ou nome)",
             Location = new Point(15, 12),
             AutoSize = true,
             Font = new Font("Segoe UI", 9F, FontStyle.Bold),
@@ -144,6 +122,7 @@ public class VendaForm : Form
         _grid.BackgroundColor = Color.White;
         _grid.RowHeadersVisible = false;
         _grid.Columns.Add("Id", "ID");
+        _grid.Columns.Add("Ean", "Cod. barras");
         _grid.Columns.Add("Nome", "Produto");
         _grid.Columns.Add("Preco", "Preco unit.");
         _grid.Columns.Add("Qtd", "Qtd");
@@ -240,26 +219,25 @@ public class VendaForm : Form
         Controls.Add(painelResumo);
     }
 
-    /// <summary>
-    /// Procura o produto digitado e adiciona ao carrinho.
-    /// A busca aceita o ID exato ou parte do nome.
-    /// </summary>
     private void BotaoAdicionar_Click(object? sender, EventArgs e)
     {
         var texto = _txtBusca.Text.Trim();
         if (string.IsNullOrEmpty(texto))
         {
-            MessageBox.Show("Digite o nome ou ID do produto.", "Atencao", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Digite o ID, o codigo de barras (inteiro) ou o nome do produto.", "Atencao", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
-        Produto? produto;
-        // Se o texto for um numero, busca por ID. Senao, busca por nome (parcial).
-        if (int.TryParse(texto, out var id))
+        Produto? produto = _produtos.FirstOrDefault(p =>
+            !string.IsNullOrEmpty(p.CodigoBarras) &&
+            string.Equals(p.CodigoBarras.Trim(), texto, StringComparison.Ordinal));
+
+        if (produto == null && int.TryParse(texto, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
         {
             produto = _produtos.FirstOrDefault(p => p.Id == id);
         }
-        else
+
+        if (produto == null)
         {
             produto = _produtos.FirstOrDefault(p => p.NomeProduto.Contains(texto, StringComparison.OrdinalIgnoreCase));
         }
@@ -311,6 +289,7 @@ public class VendaForm : Form
         {
             _grid.Rows.Add(
                 i.Produto.Id,
+                string.IsNullOrEmpty(i.Produto.CodigoBarras) ? "-" : i.Produto.CodigoBarras,
                 i.Produto.NomeProduto,
                 i.Produto.PrecoVenda.ToString("C2"),
                 i.Quantidade,
@@ -318,10 +297,6 @@ public class VendaForm : Form
         }
     }
 
-    /// <summary>
-    /// Recalcula o subtotal (soma dos itens) e o total (subtotal - desconto).
-    /// O total nunca fica abaixo de zero.
-    /// </summary>
     private void AtualizarTotais()
     {
         decimal subtotal = _carrinho.Sum(i => i.Produto.PrecoVenda * i.Quantidade);
@@ -365,10 +340,6 @@ public class VendaForm : Form
         AtualizarTotais();
     }
 
-    /// <summary>
-    /// Estrutura interna que representa uma linha do carrinho de vendas:
-    /// referencia ao produto e quantidade comprada.
-    /// </summary>
     private class ItemVenda
     {
         public Produto Produto { get; set; } = null!;

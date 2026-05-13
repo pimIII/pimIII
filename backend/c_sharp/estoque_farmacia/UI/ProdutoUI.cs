@@ -11,9 +11,6 @@ public class ProdutoUI
         _produtoService = produtoService;
     }
 
-    /// <summary>
-    /// Exibe o menu de operações relacionadas a produtos.
-    /// </summary>
 
 
 
@@ -32,9 +29,6 @@ public class ProdutoUI
         }
 
 
-    /// <summary>
-    /// Loop que processa as opções do menu de produto até o usuário retornar.
-    /// </summary>
     public void ProcessarMenuProduto()
     {
         bool continuar = true;
@@ -65,7 +59,8 @@ public class ProdutoUI
                         foreach (var p in lista)
                         {
                             string receita = p.RequerReceita ? "Sim" : "Nao";
-                            Console.WriteLine($"  ID: {p.Id} | {p.NomeProduto} | Venda: R$ {p.PrecoVenda:F2} | Custo: R$ {p.PrecoCusto:F2} | Receita: {receita}");
+                            string cb = string.IsNullOrEmpty(p.CodigoBarras) ? "-" : p.CodigoBarras;
+                            Console.WriteLine($"  ID: {p.Id} | {cb} | {p.NomeProduto} | Venda: R$ {p.PrecoVenda:F2} | Custo: R$ {p.PrecoCusto:F2} | Receita: {receita}");
                         }
                     }
 
@@ -98,9 +93,6 @@ public class ProdutoUI
 
 
 
-    /// <summary>
-    /// Lê os dados do produto no console e registra um novo produto.
-    /// </summary>
     public void CadastrarProduto()
     {
         Console.WriteLine();
@@ -111,6 +103,16 @@ public class ProdutoUI
         {
             Console.Write("  Nome nao pode ser vazio. Digite novamente: ");
             nome = Console.ReadLine();
+        }
+
+        string codigoBarras;
+        while (true)
+        {
+            Console.Write("Codigo de barras (numero inteiro): ");
+            codigoBarras = (Console.ReadLine() ?? "").Trim();
+            if (Produto.CodigoBarrasValido(codigoBarras))
+                break;
+            Console.WriteLine("  Informe um numero inteiro valido (ex: 789012).");
         }
 
         Console.Write("Preco de venda (ex: 12,50): R$ ");
@@ -147,6 +149,7 @@ public class ProdutoUI
         Produto novo = new Produto
         {
             NomeProduto = nome,
+            CodigoBarras = codigoBarras,
             PrecoVenda = precoVenda,
             PrecoCusto = precoCusto,
             IdFornecedor = idFornecedor,
@@ -160,9 +163,6 @@ public class ProdutoUI
     }
 
 
-    /// <summary>
-    /// Solicita o ID do produto e tenta removê-lo da lista.
-    /// </summary>
     public void RemoverProduto()
     {
         Console.Write("\nID do produto a remover: ");

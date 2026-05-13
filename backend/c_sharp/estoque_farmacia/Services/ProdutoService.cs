@@ -1,20 +1,14 @@
 ﻿using estoque_farmacia.Models;
-using estoque_farmacia.Data;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace estoque_farmacia.Services;
 
 public class ProdutoService
 {
+    private static readonly object Sync = new();
+    private static readonly List<Produto> Itens = new();
+    private static int _nextId = 1;
+
     public string UltimoErro { get; private set; } = string.Empty;
-
-    private readonly AppDbContext context;
-
-    public ProdutoService(AppDbContext context)
-    {
-        this.context = context;
-    }
 
     public bool Salvar(Produto novoProduto)
     {
@@ -26,18 +20,28 @@ public class ProdutoService
                 return false;
             }
 
-            context.Produtos.Add(novoProduto);
-            int registros = context.SaveChanges();
-
-            if (registros > 0)
+            if (!Produto.CodigoBarrasValido(novoProduto.CodigoBarras))
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"\n  Produto '{novoProduto.NomeProduto}' salvo com sucesso! ID: {novoProduto.Id}");
-                Console.ResetColor();
-                return true;
+                UltimoErro = "  ERRO: Codigo de barras deve ser um numero inteiro."; Console.WriteLine(UltimoErro);
+                return false;
             }
 
-            return false;
+            lock (Sync)
+            {
+                if (Itens.Any(p => p.CodigoBarras == novoProduto.CodigoBarras))
+                {
+                    UltimoErro = "  ERRO: Ja existe produto com este codigo de barras."; Console.WriteLine(UltimoErro);
+                    return false;
+                }
+
+                novoProduto.Id = _nextId++;
+                Itens.Add(novoProduto);
+            }
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"\n  Produto '{novoProduto.NomeProduto}' salvo com sucesso! ID: {novoProduto.Id}");
+            Console.ResetColor();
+            return true;
         }
         catch (Exception ex)
         {
@@ -50,23 +54,25 @@ public class ProdutoService
 
     public List<Produto> ListarTodos()
     {
-        return context.Produtos.ToList();
+        lock (Sync) return Itens.ToList();
     }
 
-    public Produto BuscarPorId(int id)
+    public Produto? BuscarPorId(int id)
     {
-        return context.Produtos.FirstOrDefault(p => p.Id == id);
+        lock (Sync) return Itens.FirstOrDefault(p => p.Id == id);
     }
 
     public bool Remover(int id)
     {
         try
         {
-            var produto = context.Produtos.FirstOrDefault(p => p.Id == id);
-            if (produto == null) return false;
+            lock (Sync)
+            {
+                var p = Itens.FirstOrDefault(x => x.Id == id);
+                if (p == null) return false;
+                Itens.Remove(p);
+            }
 
-            context.Produtos.Remove(produto);
-            context.SaveChanges();
             return true;
         }
         catch (Exception ex)
