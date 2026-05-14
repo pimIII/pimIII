@@ -5,81 +5,17 @@ using System.Collections.Generic;
 
 namespace estoque_farmacia.UI;
 
-/// <summary>
-/// CLASSE FUNCIONARIOUI (USER INTERFACE / CAMADA DE APRESENTAÇÃO)
-/// ================================================================
-///
-/// O QUE É UM UI?
-/// UI (User Interface) é a camada que INTERAGE COM O USUÁRIO.
-/// Ela mostra menus, pede dados e chama os Services para fazer o trabalho.
-///
-/// ARQUITETURA EM 3 CAMADAS:
-///
-/// 1. MODEL (Funcionario.cs)
-///    ↑ Define: "O QUE SÃO os dados"
-///    └ Propriedades: Nome, CPF, Cargo, etc.
-///
-/// 2. SERVICE (FuncionarioService.cs)
-///    ↑ Define: "O QUE FAZER COM os dados"
-///    └ Métodos: Salvar, Listar, Atualizar, Deletar
-///
-/// 3. UI (FuncionarioUI.cs) ← VOCÊ ESTÁ AQUI
-///    ↑ Define: "COMO MOSTRAR ao usuário"
-///    └ Menus, formulários, validação de entrada
-///
-/// VANTAGEM:
-/// Se mudarmos a interface (console para Web), só mexemos aqui!
-/// O Service continua o mesmo.
-///
-/// FLUXO:
-/// Usuário digita algo → UI valida → UI chama Service → Service processa → UI mostra resultado
-/// </summary>
 public class FuncionarioUI
 {
     // REFERÊNCIA AO SERVICE
     // private = só esta classe usa
     // readonly = não pode ser reatribuída depois de inicializar
-    /// <summary>
-    /// Instância do FuncionarioService.
-    /// Esse é o objeto que contém a lógica de negócio (CRUD).
-    /// A UI usa este objeto para fazer operações de funcionários.
-    ///
-    /// PADRÃO USADO: INJEÇÃO DE DEPENDÊNCIA
-    /// Em vez de criar o Service DENTRO da UI:
-    /// private FuncionarioService service = new FuncionarioService(); // RUIM
-    ///
-    /// Recebemos pelo CONSTRUTOR:
-    /// public FuncionarioUI(FuncionarioService svc) { ... } // BOM
-    ///
-    /// POR QUÊ?
-    /// - Flexibilidade: podemos trocar o Service sem mexer no código
-    /// - Testabilidade: facilita escrever testes automatizados
-    /// - Reutilizabilidade: um Service pode ser usado em múltiplas UIs
-    /// </summary>
     private readonly FuncionarioService _funcionarioService;
 
     // ========================================================================
     // CONSTRUTOR
     // ========================================================================
 
-    /// <summary>
-    /// Construtor da classe FuncionarioUI.
-    ///
-    /// O QUE É UM CONSTRUTOR?
-    /// É um método especial que EXECUTA quando você cria um novo objeto.
-    ///
-    /// EXEMPLO:
-    /// FuncionarioUI ui = new FuncionarioUI(meuService);
-    /// ↑ Aqui o construtor é chamado automaticamente
-    ///
-    /// PARÂMETRO:
-    /// - funcionarioService: o Service que será usado por esta UI
-    ///
-    /// ATRIBUIÇÃO:
-    /// this._funcionarioService = funcionarioService;
-    /// "this" = refere-se ao OBJETO ATUAL
-    /// Assim diferenciamos o parâmetro da variável de classe
-    /// </summary>
     public FuncionarioUI(FuncionarioService funcionarioService)
     {
         this._funcionarioService = funcionarioService;
@@ -89,21 +25,6 @@ public class FuncionarioUI
     // MENU PRINCIPAL DE FUNCIONÁRIOS
     // ========================================================================
 
-    /// <summary>
-    /// Exibe o menu principal de funcionários.
-    ///
-    /// Este método mostra as opções disponíveis:
-    /// 1. Cadastrar novo funcionário
-    /// 2. Listar todos os funcionários
-    /// 3. Buscar funcionário por ID
-    /// 4. Atualizar funcionário
-    /// 5. Inativar funcionário
-    /// 6. Voltar ao menu anterior
-    ///
-    /// O "static void" aqui significa:
-    /// - static: não precisa de um objeto para chamar (Menu.MostrarMenu())
-    /// - void: não retorna nada, só exibe texto
-    /// </summary>
     public static void MostrarMenu()
     {
         Console.Clear();
@@ -129,24 +50,6 @@ public class FuncionarioUI
     // MÉTODO: PROCESSAR MENU
     // ========================================================================
 
-    /// <summary>
-    /// Loop principal que processa as opções do menu.
-    ///
-    /// O QUE ESTE MÉTODO FAZ?
-    /// 1. Mostra o menu
-    /// 2. Pega a opção do usuário
-    /// 3. Chama o método correspondente
-    /// 4. Volta para o menu (exceto se escolher sair)
-    ///
-    /// ESTRUTURA: while (loop) + switch (casos)
-    /// - while = repete enquanto continuar == true
-    /// - switch = escolhe qual método chamar baseado na opção
-    /// - break = sai do switch (mas fica no while)
-    /// - continuar = false = sai do while
-    ///
-    /// FLUXO:
-    /// Menu → Opção → Ação → Menu novamente (até escolher 6)
-    /// </summary>
     public void ProcessarMenuFuncionario()
     {
         // VARIÁVEL DE CONTROLE
@@ -213,21 +116,6 @@ public class FuncionarioUI
     // MÉTODO: CADASTRAR NOVO FUNCIONÁRIO
     // ========================================================================
 
-    /// <summary>
-    /// Pede os dados ao usuário e cadastra um novo funcionário.
-    ///
-    /// FLUXO:
-    /// 1. Limpa a tela
-    /// 2. Pede cada dado ao usuário
-    /// 3. Cria um novo objeto Funcionario
-    /// 4. Chama o Service para salvar
-    /// 5. Mostra mensagem de sucesso/erro
-    /// 6. Aguarda o usuário clicar Enter
-    ///
-    /// PADRÃO: Validação BÁSICA
-    /// Aqui validamos se o usuário não deixou em branco.
-    /// Validações mais complexas acontecem no Service.
-    /// </summary>
     private void CadastrarFuncionario()
     {
         Console.Clear();
@@ -319,23 +207,6 @@ public class FuncionarioUI
     // MÉTODO: LISTAR TODOS OS FUNCIONÁRIOS
     // ========================================================================
 
-    /// <summary>
-    /// Exibe uma lista com TODOS os funcionários cadastrados.
-    ///
-    /// FLUXO:
-    /// 1. Chama o Service para obter a lista
-    /// 2. Verifica se tem funcionários
-    /// 3. Mostra em formato de tabela
-    /// 4. Aguarda o usuário
-    ///
-    /// CONCEITO: FOREACH
-    /// foreach = "para cada" item na lista
-    /// var = deixa o C# descobrir o tipo automaticamente
-    ///
-    /// EXEMPLO:
-    /// foreach (var numero in lista) { ... }
-    /// // num = 1, depois 2, depois 3, etc.
-    /// </summary>
     private void ListarTodosFuncionarios()
     {
         Console.Clear();
@@ -389,15 +260,6 @@ public class FuncionarioUI
     // MÉTODO: BUSCAR FUNCIONÁRIO POR ID
     // ========================================================================
 
-    /// <summary>
-    /// Busca um funcionário específico pelo ID e mostra os detalhes.
-    ///
-    /// FLUXO:
-    /// 1. Pede o ID do usuário
-    /// 2. Chama o Service para buscar
-    /// 3. Se encontrou, mostra os detalhes
-    /// 4. Se não, mostra mensagem de erro
-    /// </summary>
     private void BuscarFuncionarioPorId()
     {
         Console.Clear();
@@ -457,16 +319,6 @@ public class FuncionarioUI
     // MÉTODO: ATUALIZAR FUNCIONÁRIO
     // ========================================================================
 
-    /// <summary>
-    /// Atualiza os dados de um funcionário existente.
-    ///
-    /// FLUXO:
-    /// 1. Pede o ID do funcionário a atualizar
-    /// 2. Busca o funcionário
-    /// 3. Se encontrou, pede os dados novos
-    /// 4. Chama o Service para atualizar
-    /// 5. Mostra resultado
-    /// </summary>
     private void AtualizarFuncionario()
     {
         Console.Clear();
@@ -539,19 +391,6 @@ public class FuncionarioUI
     // MÉTODO: INATIVAR FUNCIONÁRIO
     // ========================================================================
 
-    /// <summary>
-    /// Inativa um funcionário (marca como não ativo).
-    ///
-    /// FLUXO:
-    /// 1. Pede o ID
-    /// 2. Pede confirmação (segurança)
-    /// 3. Chama o Service para inativar
-    /// 4. Mostra resultado
-    ///
-    /// IMPORTANTE:
-    /// Pedimos CONFIRMAÇÃO antes de deletar.
-    /// Isso evita acidentes (usuário clicando errado).
-    /// </summary>
     private void InativarFuncionario()
     {
         Console.Clear();
@@ -610,19 +449,6 @@ public class FuncionarioUI
     // MÉTODO AUXILIAR: PAUSAR MENU
     // ========================================================================
 
-    /// <summary>
-    /// Aguarda o usuário pressionar Enter antes de continuar.
-    ///
-    /// FUNÇÃO:
-    /// Dar tempo ao usuário de ler as mensagens antes de limpar a tela.
-    ///
-    /// EXEMPLO:
-    /// Console.WriteLine("Operação concluída!");
-    /// PauseMenu(); // aguarda Enter
-    /// // Agora mostra o próximo menu
-    ///
-    /// Console.ReadLine() = fica esperando o usuário digitar algo + Enter
-    /// </summary>
     private void PauseMenu()
     {
         Console.WriteLine("\nPressione ENTER para continuar...");

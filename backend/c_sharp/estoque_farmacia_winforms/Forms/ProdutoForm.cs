@@ -5,33 +5,19 @@ using estoque_farmacia.Services;
 
 namespace estoque_farmacia_winforms.Forms;
 
-/// <summary>
-/// TELA DE CADASTRO DE PRODUTOS
-/// =============================
-///
-/// Permite cadastrar, listar e remover produtos. Os dados ficam
-/// no PostgreSQL via Entity Framework Core.
-///
-/// Layout:
-///   - Painel da esquerda: formulario com os campos de cadastro
-///   - Painel da direita: tabela com os produtos ja cadastrados
-/// </summary>
 public class ProdutoForm : Form
 {
     private readonly ProdutoService _service;
 
     // Campos do formulario.
     private readonly TextBox _txtNome = new();
+    private readonly TextBox _txtCodigoBarras = new();
     private readonly TextBox _txtPrecoVenda = new();
     private readonly TextBox _txtPrecoCusto = new();
     private readonly TextBox _txtIdFornecedor = new();
     private readonly CheckBox _chkRequerReceita = new();
     private readonly DataGridView _grid = new();
 
-    /// <summary>
-    /// Construtor: recebe o ProdutoService via injecao de dependencia.
-    /// O service ja vem com o AppDbContext pronto para uso.
-    /// </summary>
     public ProdutoForm(ProdutoService service)
     {
         _service = service;
@@ -43,7 +29,7 @@ public class ProdutoForm : Form
     private void ConfigurarJanela()
     {
         Text = "Cadastro de Produtos";
-        Size = new Size(950, 580);
+        Size = new Size(1020, 620);
         StartPosition = FormStartPosition.CenterParent;
         BackColor = UIHelper.CorFundo;
         Font = new Font("Segoe UI", 9F);
@@ -68,7 +54,7 @@ public class ProdutoForm : Form
         var painelForm = new Panel
         {
             Location = new Point(20, 80),
-            Size = new Size(320, 460),
+            Size = new Size(340, 520),
             BackColor = Color.White,
             BorderStyle = BorderStyle.FixedSingle
         };
@@ -76,6 +62,7 @@ public class ProdutoForm : Form
         int y = 20;
 
         AdicionarCampo(painelForm, "Nome do produto", _txtNome, ref y);
+        AdicionarCampo(painelForm, "Codigo de barras (numero inteiro)", _txtCodigoBarras, ref y);
         AdicionarCampo(painelForm, "Preco de venda (ex: 12,50)", _txtPrecoVenda, ref y);
         AdicionarCampo(painelForm, "Preco de custo (ex: 8,00)", _txtPrecoCusto, ref y);
         AdicionarCampo(painelForm, "ID do fornecedor", _txtIdFornecedor, ref y);
@@ -104,14 +91,14 @@ public class ProdutoForm : Form
         // Painel direito com a grade de produtos cadastrados.
         var painelGrid = new Panel
         {
-            Location = new Point(360, 80),
-            Size = new Size(560, 460),
+            Location = new Point(380, 80),
+            Size = new Size(610, 520),
             BackColor = Color.White,
             BorderStyle = BorderStyle.FixedSingle
         };
 
         _grid.Location = new Point(10, 10);
-        _grid.Size = new Size(540, 400);
+        _grid.Size = new Size(590, 450);
         _grid.AllowUserToAddRows = false;        // nao mostra linha em branco para nova entrada
         _grid.ReadOnly = true;
         _grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
@@ -120,11 +107,11 @@ public class ProdutoForm : Form
         _grid.BackgroundColor = Color.White;
         _grid.RowHeadersVisible = false;
 
-        var btnRemover = new Button { Text = "Remover selecionado", Location = new Point(10, 415), Size = new Size(200, 35) };
+        var btnRemover = new Button { Text = "Remover selecionado", Location = new Point(10, 470), Size = new Size(200, 35) };
         UIHelper.EstilizarBotaoPerigo(btnRemover);
         btnRemover.Click += BotaoRemover_Click;
 
-        var btnAtualizar = new Button { Text = "Atualizar lista", Location = new Point(220, 415), Size = new Size(150, 35) };
+        var btnAtualizar = new Button { Text = "Atualizar lista", Location = new Point(220, 470), Size = new Size(150, 35) };
         UIHelper.EstilizarBotaoSecundario(btnAtualizar);
         btnAtualizar.Click += (_, _) => CarregarDados();
 
@@ -134,10 +121,6 @@ public class ProdutoForm : Form
         Controls.Add(painelGrid);
     }
 
-    /// <summary>
-    /// Helper que adiciona um par "label + textbox" no painel de cadastro.
-    /// Atualiza o "y" para o proximo campo aparecer logo abaixo.
-    /// </summary>
     private static void AdicionarCampo(Control painel, string textoLabel, TextBox campo, ref int y)
     {
         var label = new Label
@@ -152,15 +135,12 @@ public class ProdutoForm : Form
         y += 22;
 
         campo.Location = new Point(20, y);
-        campo.Size = new Size(280, 26);
+        campo.Size = new Size(300, 26);
         UIHelper.EstilizarCampo(campo);
         painel.Controls.Add(campo);
         y += 40;
     }
 
-    /// <summary>
-    /// Carrega a lista de produtos do banco e exibe na grade.
-    /// </summary>
     private void CarregarDados()
     {
         var lista = _service.ListarTodos();
@@ -172,6 +152,7 @@ public class ProdutoForm : Form
         // Define as colunas que serao mostradas. Usamos colunas manuais
         // em vez de DataSource para poder formatar valores (preco em reais).
         _grid.Columns.Add("Id", "ID");
+        _grid.Columns.Add("CodigoBarras", "Cod. barras");
         _grid.Columns.Add("Nome", "Nome");
         _grid.Columns.Add("PrecoVenda", "Venda");
         _grid.Columns.Add("PrecoCusto", "Custo");
@@ -182,6 +163,7 @@ public class ProdutoForm : Form
         {
             _grid.Rows.Add(
                 p.Id,
+                string.IsNullOrEmpty(p.CodigoBarras) ? "-" : p.CodigoBarras,
                 p.NomeProduto,
                 p.PrecoVenda.ToString("C2"),                     // C2 = formato monetario com 2 casas
                 p.PrecoCusto.ToString("C2"),
@@ -190,15 +172,20 @@ public class ProdutoForm : Form
         }
     }
 
-    /// <summary>
-    /// Acao do botao "Salvar". Valida os campos e chama o service.
-    /// </summary>
     private void BotaoSalvar_Click(object? sender, EventArgs e)
     {
         // Validacoes basicas antes de ir ao service.
         if (string.IsNullOrWhiteSpace(_txtNome.Text))
         {
             MessageBox.Show("Informe o nome do produto.", "Atencao", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
+        var codigoBarras = _txtCodigoBarras.Text.Trim();
+        if (!Produto.CodigoBarrasValido(codigoBarras))
+        {
+            MessageBox.Show("Informe um codigo de barras que seja um numero inteiro valido.", "Atencao", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            _txtCodigoBarras.Focus();
             return;
         }
 
@@ -224,6 +211,7 @@ public class ProdutoForm : Form
         var novo = new Produto
         {
             NomeProduto = _txtNome.Text.Trim(),
+            CodigoBarras = codigoBarras,
             PrecoVenda = decimal.Round(precoVenda, 2),
             PrecoCusto = decimal.Round(precoCusto, 2),
             IdFornecedor = idFornecedor,
@@ -243,9 +231,6 @@ public class ProdutoForm : Form
         }
     }
 
-    /// <summary>
-    /// Acao do botao "Remover". Confirma e chama o service.
-    /// </summary>
     private void BotaoRemover_Click(object? sender, EventArgs e)
     {
         if (_grid.SelectedRows.Count == 0)
@@ -273,6 +258,7 @@ public class ProdutoForm : Form
     private void LimparCampos()
     {
         _txtNome.Clear();
+        _txtCodigoBarras.Clear();
         _txtPrecoVenda.Clear();
         _txtPrecoCusto.Clear();
         _txtIdFornecedor.Clear();

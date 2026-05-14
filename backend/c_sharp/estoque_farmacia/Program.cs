@@ -1,66 +1,25 @@
 ﻿using estoque_farmacia.UI;
-using estoque_farmacia.Models;
 using estoque_farmacia.Services;
-using estoque_farmacia.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
 
-// Habilita o comportamento antigo do Npgsql para DateTime sem Kind=Utc.
-// Sem isso, gravar DateTime.Now em colunas de data falha porque o driver
-// exige UTC explicito.
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+var funcionarioService = new FuncionarioService();
+var produtoService = new ProdutoService();
+var fornecedorService = new FornecedorService();
+var loteService = new LoteService(produtoService);
 
-// Carregar configurações
-var configuration = new ConfigurationBuilder()
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .Build();
+var menu = new Menu(
+    new FuncionarioUI(funcionarioService),
+    new ProdutoUI(produtoService),
+    new FornecedorUI(fornecedorService),
+    new LoteUI(loteService));
 
-// Configurar injeção de dependências
-var services = new ServiceCollection();
-
-// Registrar DbContext usando o provedor PostgreSQL (Npgsql).
-// A escolha de PostgreSQL atende ao requisito do manual do PIM III.
-services.AddDbContext<AppDbContext>(options =>
-{
-    var connectionString = configuration.GetConnectionString("DefaultConnection");
-    options.UseNpgsql(connectionString);
-});
-
-// Registrar Services
-services.AddScoped<FuncionarioService>();
-services.AddScoped<ProdutoService>();
-services.AddScoped<FornecedorService>();
-
-// Registrar UIs
-services.AddScoped<FuncionarioUI>();
-services.AddScoped<ProdutoUI>();
-services.AddScoped<FornecedorUI>();
-
-// Registrar Menu
-services.AddScoped<Menu>();
-
-var serviceProvider = services.BuildServiceProvider();
-
-// Iniciar aplicação
 try
 {
-    var menuVariavel = serviceProvider.GetRequiredService<Menu>();
-
-    if (menuVariavel.ValidarLogin())
-    {
-        menuVariavel.ProcessarMenu();
-    }
+    if (menu.ValidarLogin())
+        menu.ProcessarMenu();
     else
-    {
         Console.WriteLine("Sistema encerrado por não autorização.");
-    }
 }
 catch (Exception ex)
 {
     Console.WriteLine($"ERRO ao inicializar aplicação: {ex.Message}");
-    Console.WriteLine("\nVerifique se:");
-    Console.WriteLine("1. PostgreSQL está rodando (serviço postgresql-x64-17)");
-    Console.WriteLine("2. Connection string em appsettings.json está correta");
-    Console.WriteLine("3. Banco de dados foi criado e migrations aplicadas (dotnet ef database update)");
 }
