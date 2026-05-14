@@ -16,9 +16,9 @@ create table funcionario (
 	cpf varchar (11) unique,
 	cargo varchar (50),
 	email varchar (50),
-	senha varchar (25) not null,
+	senha_hash varchar (25) not null,
 	data_admissao date default current_date not null,
-	ativo char (1) check (ativo in ('S', 'N')) not null
+	ativo BOOLEAN not null
 ); -- fim
 
 -- Tabela para usuario atual logado no sistema
