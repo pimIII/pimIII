@@ -9,6 +9,8 @@ namespace estoque_farmacia_winforms.Forms;
 public class VendaForm : Form
 {
     private readonly ProdutoService _produtoService;
+    private readonly VendaService _vendaService;
+    private readonly Estoque _estoque;
 
     private readonly TextBox _txtBusca = new();
     private readonly NumericUpDown _numQtd = new();
@@ -21,9 +23,11 @@ public class VendaForm : Form
 
     private List<Produto> _produtos = new();
 
-    public VendaForm(ProdutoService produtoService)
+    public VendaForm(ProdutoService produtoService, VendaService vendaService, Estoque estoque)
     {
         _produtoService = produtoService;
+        _vendaService = vendaService;
+        _estoque = estoque;
         ConfigurarJanela();
         ConstruirTela();
         _produtos = _produtoService.ListarTodos();
@@ -41,7 +45,6 @@ public class VendaForm : Form
 
     private void ConstruirTela()
     {
-        // Cabecalho azul.
         var topo = new Panel { Dock = DockStyle.Top, Height = 60, BackColor = UIHelper.CorPrimaria };
         var lbl = new Label
         {
@@ -54,7 +57,6 @@ public class VendaForm : Form
         topo.Controls.Add(lbl);
         Controls.Add(topo);
 
-        // Painel de busca e adicionar produto.
         var painelBusca = new Panel
         {
             Location = new Point(20, 80),
@@ -103,7 +105,6 @@ public class VendaForm : Form
         painelBusca.Controls.Add(btnAdicionar);
         Controls.Add(painelBusca);
 
-        // Grade do carrinho.
         var painelCarrinho = new Panel
         {
             Location = new Point(20, 175),
@@ -136,7 +137,6 @@ public class VendaForm : Form
         painelCarrinho.Controls.Add(btnRemoverItem);
         Controls.Add(painelCarrinho);
 
-        // Painel direito: resumo da venda.
         var painelResumo = new Panel
         {
             Location = new Point(660, 175),
@@ -207,6 +207,10 @@ public class VendaForm : Form
         UIHelper.EstilizarBotaoSecundario(btnLimpar);
         btnLimpar.Click += BotaoCancelar_Click;
 
+        var btnHistorico = new Button { Text = "Historico de vendas", Location = new Point(15, 370), Size = new Size(220, 38) };
+        UIHelper.EstilizarBotaoSecundario(btnHistorico);
+        btnHistorico.Click += BotaoHistorico_Click;
+
         painelResumo.Controls.Add(lblTituloResumo);
         painelResumo.Controls.Add(lblSubLabel);
         painelResumo.Controls.Add(_lblSubtotal);
@@ -216,6 +220,7 @@ public class VendaForm : Form
         painelResumo.Controls.Add(_lblTotal);
         painelResumo.Controls.Add(btnFinalizar);
         painelResumo.Controls.Add(btnLimpar);
+        painelResumo.Controls.Add(btnHistorico);
         Controls.Add(painelResumo);
     }
 
@@ -233,14 +238,10 @@ public class VendaForm : Form
             string.Equals(p.CodigoBarras.Trim(), texto, StringComparison.Ordinal));
 
         if (produto == null && int.TryParse(texto, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
-        {
             produto = _produtos.FirstOrDefault(p => p.Id == id);
-        }
 
         if (produto == null)
-        {
             produto = _produtos.FirstOrDefault(p => p.NomeProduto.Contains(texto, StringComparison.OrdinalIgnoreCase));
-        }
 
         if (produto == null)
         {
@@ -249,16 +250,27 @@ public class VendaForm : Form
         }
 
         var qtd = (int)_numQtd.Value;
+        var existente = _carrinho.FirstOrDefault(i => i.IdProduto == produto.Id);
+        int qtdTotal = existente != null ? existente.Quantidade + qtd : qtd;
 
-        // Se ja estiver no carrinho, soma a quantidade. Senao, adiciona.
-        var existente = _carrinho.FirstOrDefault(i => i.Produto.Id == produto.Id);
-        if (existente != null)
+        if (!_estoque.TemEstoque(produto.Id, qtdTotal))
         {
-            existente.Quantidade += qtd;
+            var disponivel = _estoque.ObterDisponivel(produto.Id);
+            MessageBox.Show($"Estoque insuficiente. Disponivel: {disponivel}.", "Atencao", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
         }
+
+        if (existente != null)
+            existente.Quantidade += qtd;
         else
         {
-            _carrinho.Add(new ItemVenda { Produto = produto, Quantidade = qtd });
+            _carrinho.Add(new ItemVenda
+            {
+                IdProduto = produto.Id,
+                NomeProduto = produto.NomeProduto,
+                Quantidade = qtd,
+                PrecoUnitario = produto.PrecoVenda
+            });
         }
 
         _txtBusca.Clear();
@@ -277,7 +289,7 @@ public class VendaForm : Form
         }
 
         var idProduto = Convert.ToInt32(_grid.SelectedRows[0].Cells["Id"].Value);
-        _carrinho.RemoveAll(i => i.Produto.Id == idProduto);
+        _carrinho.RemoveAll(i => i.IdProduto == idProduto);
         RecarregarCarrinho();
         AtualizarTotais();
     }
@@ -287,19 +299,21 @@ public class VendaForm : Form
         _grid.Rows.Clear();
         foreach (var i in _carrinho)
         {
+            var produto = _produtos.FirstOrDefault(p => p.Id == i.IdProduto);
+            var codigo = produto != null && !string.IsNullOrEmpty(produto.CodigoBarras) ? produto.CodigoBarras : "-";
             _grid.Rows.Add(
-                i.Produto.Id,
-                string.IsNullOrEmpty(i.Produto.CodigoBarras) ? "-" : i.Produto.CodigoBarras,
-                i.Produto.NomeProduto,
-                i.Produto.PrecoVenda.ToString("C2"),
+                i.IdProduto,
+                codigo,
+                i.NomeProduto,
+                i.PrecoUnitario.ToString("C2"),
                 i.Quantidade,
-                (i.Produto.PrecoVenda * i.Quantidade).ToString("C2"));
+                i.Subtotal.ToString("C2"));
         }
     }
 
     private void AtualizarTotais()
     {
-        decimal subtotal = _carrinho.Sum(i => i.Produto.PrecoVenda * i.Quantidade);
+        decimal subtotal = _carrinho.Sum(i => i.Subtotal);
         decimal desconto = _numDesconto.Value;
         decimal total = Math.Max(0, subtotal - desconto);
 
@@ -315,19 +329,28 @@ public class VendaForm : Form
             return;
         }
 
-        decimal total = _carrinho.Sum(i => i.Produto.PrecoVenda * i.Quantidade) - _numDesconto.Value;
-        if (total < 0) total = 0;
+        decimal desconto = _numDesconto.Value;
+        if (_vendaService.Finalizar(_carrinho.ToList(), desconto))
+        {
+            decimal total = _carrinho.Sum(i => i.Subtotal) - desconto;
+            if (total < 0) total = 0;
 
-        MessageBox.Show(
-            $"Venda registrada.\nItens: {_carrinho.Count}\nTotal: {total:C2}",
-            "Sucesso",
-            MessageBoxButtons.OK,
-            MessageBoxIcon.Information);
+            MessageBox.Show(
+                $"Venda registrada.\nItens: {_carrinho.Count}\nTotal: {total:C2}",
+                "Sucesso",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
 
-        _carrinho.Clear();
-        _numDesconto.Value = 0;
-        RecarregarCarrinho();
-        AtualizarTotais();
+            _carrinho.Clear();
+            _numDesconto.Value = 0;
+            RecarregarCarrinho();
+            AtualizarTotais();
+        }
+        else
+        {
+            var motivo = string.IsNullOrEmpty(_vendaService.UltimoErro) ? "Verifique o estoque dos produtos." : _vendaService.UltimoErro;
+            MessageBox.Show(motivo, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
     }
 
     private void BotaoCancelar_Click(object? sender, EventArgs e)
@@ -340,9 +363,9 @@ public class VendaForm : Form
         AtualizarTotais();
     }
 
-    private class ItemVenda
+    private void BotaoHistorico_Click(object? sender, EventArgs e)
     {
-        public Produto Produto { get; set; } = null!;
-        public int Quantidade { get; set; }
+        using var f = new VendaHistoricoForm(_vendaService);
+        f.ShowDialog(this);
     }
 }

@@ -1,6 +1,4 @@
 using System.Drawing;
-using System.Security.Cryptography;
-using System.Text;
 using System.Windows.Forms;
 using estoque_farmacia.Models;
 using estoque_farmacia.Services;
@@ -143,14 +141,6 @@ public class FuncionarioForm : Form
         y += 40;
     }
 
-    private static string GerarHashSenha(string senha)
-    {
-        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(senha));
-        var sb = new StringBuilder();
-        foreach (var b in bytes) sb.Append(b.ToString("x2"));
-        return sb.ToString();
-    }
-
     private void CarregarDados()
     {
         var lista = _service.ListarTodos();
@@ -204,7 +194,7 @@ public class FuncionarioForm : Form
             Nome = _txtNome.Text.Trim(),
             CPF = _txtCpf.Text.Trim(),
             Cargo = _txtCargo.Text.Trim(),
-            SenhaHash = GerarHashSenha(_txtSenha.Text),
+            SenhaHash = SenhaHasher.HashSha256(_txtSenha.Text),
             DataAdmissao = DateTime.Now,
             Ativo = true
         };

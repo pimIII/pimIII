@@ -6,8 +6,19 @@ namespace estoque_farmacia_winforms.Forms;
 
 public class MenuForm : Form
 {
+    private readonly FornecedorService _fornecedorService = new();
+    private readonly ProdutoService _produtoService;
+    private readonly LoteService _loteService;
+    private readonly Estoque _estoque;
+    private readonly VendaService _vendaService;
+
     public MenuForm()
     {
+        _produtoService = new ProdutoService(_fornecedorService);
+        _loteService = new LoteService(_produtoService);
+        _estoque = new Estoque(_loteService);
+        _vendaService = new VendaService(_produtoService, _estoque);
+
         ConfigurarJanela();
         ConstruirTela();
     }
@@ -103,7 +114,7 @@ public class MenuForm : Form
 
     private void AbrirProdutos(object? s, EventArgs e)
     {
-        using var f = new ProdutoForm(new ProdutoService());
+        using var f = new ProdutoForm(_produtoService);
         f.ShowDialog(this);
     }
 
@@ -115,20 +126,19 @@ public class MenuForm : Form
 
     private void AbrirFornecedores(object? s, EventArgs e)
     {
-        using var f = new FornecedorForm(new FornecedorService());
+        using var f = new FornecedorForm(_fornecedorService);
         f.ShowDialog(this);
     }
 
     private void AbrirVendas(object? s, EventArgs e)
     {
-        using var f = new VendaForm(new ProdutoService());
+        using var f = new VendaForm(_produtoService, _vendaService, _estoque);
         f.ShowDialog(this);
     }
 
     private void AbrirLotes(object? s, EventArgs e)
     {
-        var produtoService = new ProdutoService();
-        using var f = new LoteForm(new LoteService(produtoService));
+        using var f = new LoteForm(_loteService);
         f.ShowDialog(this);
     }
 }

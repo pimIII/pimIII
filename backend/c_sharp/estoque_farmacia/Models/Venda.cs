@@ -1,16 +1,31 @@
+namespace estoque_farmacia.Models;
 
-// Venda
+public class ItemVenda
+{
+    public int IdProduto { get; set; }
 
-// id_venda
+    public string NomeProduto { get; set; } = string.Empty;
 
-// id_funcionario
+    public int Quantidade { get; set; }
 
-// data_venda
-// DATETIME
-// valor_total
-// DECIMAL(10,2)
-// forma_pagamento
-// VARCHAR(30)
-//preco venda
+    public decimal PrecoUnitario { get; set; }
 
+    public decimal Subtotal => PrecoUnitario * Quantidade;
+}
 
+public class Venda
+{
+    public int Id { get; set; }
+
+    public int IdFuncionario { get; set; }
+
+    public DateTime DataVenda { get; set; }
+
+    public decimal Subtotal { get; set; }
+
+    public decimal Desconto { get; set; }
+
+    public decimal ValorTotal { get; set; }
+
+    public List<ItemVenda> Itens { get; set; } = new();
+}

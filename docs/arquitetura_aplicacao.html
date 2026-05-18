@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arquitetura da Aplicação — Pharmastock</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      line-height: 1.6;
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      color: #1a3a52;
+    }
+    h1 { color: #0078d7; border-bottom: 2px solid #0078d7; padding-bottom: 0.3rem; }
+    h2 { color: #0078d7; margin-top: 2rem; }
+    h3 { color: #1a3a52; margin-top: 1.5rem; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+    th, td { border: 1px solid #ccc; padding: 0.5rem 0.75rem; text-align: left; }
+    th { background: #f5f8fc; }
+    pre {
+      background: #f5f8fc;
+      border: 1px solid #ddd;
+      padding: 1rem;
+      overflow-x: auto;
+      font-size: 0.9rem;
+    }
+    .placeholder {
+      border: 2px dashed #0078d7;
+      background: #f5f8fc;
+      padding: 2rem;
+      text-align: center;
+      color: #555;
+      margin: 1.5rem 0;
+    }
+    ul { padding-left: 1.5rem; }
+    li { margin: 0.35rem 0; }
+  </style>
+</head>
+<body>
+
+  <h1>Arquitetura da Aplicação</h1>
+
+  <p>
+    O <strong>Pharmastock</strong> (Sistema de Estoque para Farmácia) foi organizado em
+    <strong>três camadas lógicas</strong> — <strong>Models</strong>, <strong>Services</strong> e
+    <strong>UI</strong> — no projeto principal <code>estoque_farmacia</code>. Essa divisão segue um
+    padrão simples de aplicação em camadas, adequado ao estágio do curso: cada parte do código tem um
+    papel claro, o que facilita manutenção, trabalho em equipe e evolução futura (por exemplo,
+    persistência em banco de dados no próximo semestre).
+  </p>
+
+  <p>
+    O sistema possui <strong>duas interfaces de usuário</strong>:
+  </p>
+  <ul>
+    <li><strong>Console</strong> — menus em texto na pasta <code>UI/</code> do projeto <code>estoque_farmacia</code>;</li>
+    <li><strong>Windows Forms</strong> — telas gráficas no projeto <code>estoque_farmacia_winforms</code>, na pasta <code>Forms/</code>.</li>
+  </ul>
+  <p>
+    Ambas reutilizam os mesmos <strong>Models</strong> e <strong>Services</strong> do projeto base. No WinForms,
+    os arquivos compartilhados são referenciados via <code>Link</code> no <code>.csproj</code>, evitando duplicar
+    regras de negócio.
+  </p>
+
+  <h2>Visão geral das três camadas</h2>
+
+  <h3>1. Camada Models (<code>estoque_farmacia.Models</code>)</h3>
+  <p>
+    Representa as <strong>entidades do domínio</strong> — os “dados” do sistema, sem lógica de tela ou de
+    persistência complexa.
+  </p>
+  <table>
+    <thead>
+      <tr><th>Classe</th><th>Papel resumido</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>Funcionario</code></td><td>Dados do funcionário (nome, CPF, cargo, senha hash)</td></tr>
+      <tr><td><code>Produto</code></td><td>Medicamento/produto (preços, código de barras, etc.)</td></tr>
+      <tr><td><code>Fornecedor</code></td><td>Empresa fornecedora</td></tr>
+      <tr><td><code>Lote</code></td><td>Lote de produto (validade, quantidade)</td></tr>
+      <tr><td><code>Venda</code></td><td>Registro de venda (data, totais, itens)</td></tr>
+      <tr><td><code>ItemVenda</code></td><td>Item individual dentro de uma venda</td></tr>
+    </tbody>
+  </table>
+  <p>
+    As classes são principalmente <strong>propriedades</strong> (<code>get</code>/<code>set</code>), espelhando
+    tabelas que o grupo modelou em SQL na pasta <code>backend/database</code>.
+  </p>
+
+  <h3>2. Camada Services (<code>estoque_farmacia.Services</code>)</h3>
+  <p>
+    Concentra a <strong>lógica de negócio</strong> e o <strong>armazenamento em memória</strong> (listas estáticas
+    com <code>lock</code> para acesso seguro).
+  </p>
+  <table>
+    <thead>
+      <tr><th>Serviço / classe</th><th>Responsabilidade principal</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>FuncionarioService</code></td><td>CRUD de funcionários, validação de CPF duplicado</td></tr>
+      <tr><td><code>ProdutoService</code></td><td>CRUD de produtos; valida fornecedor e código de barras</td></tr>
+      <tr><td><code>FornecedorService</code></td><td>CRUD de fornecedores</td></tr>
+      <tr><td><code>LoteService</code></td><td>CRUD de lotes; valida se o produto existe</td></tr>
+      <tr><td><code>Estoque</code></td><td>Consulta e baixa de quantidade nos lotes</td></tr>
+      <tr><td><code>VendaService</code></td><td>Finaliza venda, valida estoque, registra venda e baixa lotes</td></tr>
+      <tr><td><code>SenhaHasher</code></td><td>Gera hash SHA-256 da senha do funcionário</td></tr>
+    </tbody>
+  </table>
+  <p>
+    A UI <strong>não</strong> manipula listas diretamente: ela chama métodos como <code>Salvar</code>,
+    <code>ListarTodos</code>, <code>Finalizar</code>, e lê <code>UltimoErro</code> quando algo falha.
+  </p>
+
+  <h3>3. Camada UI</h3>
+  <p><strong>Console (<code>estoque_farmacia.UI</code>)</strong> — interação via <code>Console.ReadLine</code>, menus e mensagens coloridas:</p>
+  <ul>
+    <li><code>Menu</code> — login e menu principal</li>
+    <li><code>FuncionarioUI</code>, <code>ProdutoUI</code>, <code>FornecedorUI</code>, <code>LoteUI</code>, <code>VendaUI</code> — fluxos por módulo</li>
+  </ul>
+  <p><strong>Windows Forms (<code>estoque_farmacia_winforms</code>)</strong> — equivalente gráfico:</p>
+  <ul>
+    <li><code>Forms/</code> — <code>LoginForm</code>, <code>MenuForm</code>, <code>ProdutoForm</code>, <code>FuncionarioForm</code>, etc.</li>
+    <li><code>UIHelper</code> — cores e estilo visual comum às telas</li>
+  </ul>
+  <p>
+    O ponto de entrada do console é <code>Program.cs</code>, que <strong>instancia os serviços</strong> e injeta
+    nas classes UI. O WinForms faz o mesmo em <code>MenuForm</code>, mantendo <strong>uma única fonte de dados</strong>
+    (listas estáticas nos services).
+  </p>
+
+  <h2>Organização dos namespaces e pastas</h2>
+
+  <p><strong>Namespace raiz do núcleo:</strong> <code>estoque_farmacia</code></p>
+
+  <p><strong>Namespaces por pasta (projeto <code>estoque_farmacia</code>):</strong></p>
+  <table>
+    <thead>
+      <tr><th>Pasta</th><th>Namespace</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>Models/</code></td><td><code>estoque_farmacia.Models</code></td></tr>
+      <tr><td><code>Services/</code></td><td><code>estoque_farmacia.Services</code></td></tr>
+      <tr><td><code>UI/</code></td><td><code>estoque_farmacia.UI</code></td></tr>
+      <tr><td><code>Program.cs</code></td><td>(top-level statements, sem classe Program explícita)</td></tr>
+    </tbody>
+  </table>
+
+  <p><strong>Projeto WinForms:</strong></p>
+  <table>
+    <thead>
+      <tr><th>Pasta / arquivo</th><th>Namespace</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>Forms/*.cs</code></td><td><code>estoque_farmacia_winforms.Forms</code></td></tr>
+      <tr><td><code>UIHelper.cs</code></td><td><code>estoque_farmacia_winforms</code></td></tr>
+      <tr><td><code>Program.cs</code></td><td><code>estoque_farmacia_winforms</code></td></tr>
+      <tr><td>Models e Services (via Link no <code>.csproj</code>)</td><td><code>estoque_farmacia.Models</code> / <code>estoque_farmacia.Services</code></td></tr>
+    </tbody>
+  </table>
+
+  <p><strong>Estrutura de pastas (referência para o print):</strong></p>
+  <pre>backend/c_sharp/
+├── c_sharp.slnx
+├── estoque_farmacia/                    ← projeto Console (núcleo)
+│   ├── Models/
+│   │   ├── Funcionario.cs
+│   │   ├── Produto.cs
+│   │   ├── Fornecedor.cs
+│   │   ├── Lote.cs
+│   │   └── Venda.cs
+│   ├── Services/
+│   │   ├── FuncionarioService.cs
+│   │   ├── ProdutoService.cs
+│   │   ├── FornecedorService.cs
+│   │   ├── LoteService.cs
+│   │   ├── Estoque.cs
+│   │   ├── VendaService.cs
+│   │   └── SenhaHasher.cs
+│   ├── UI/
+│   │   ├── Menu.cs
+│   │   ├── FuncionarioUI.cs
+│   │   ├── ProdutoUI.cs
+│   │   ├── FornecedorUI.cs
+│   │   ├── LoteUI.cs
+│   │   └── VendaUI.cs
+│   ├── Program.cs
+│   ├── estoque_farmacia.csproj
+│   └── estoque_farmacia.sln
+└── estoque_farmacia_winforms/           ← projeto Windows Forms
+    ├── Forms/
+    │   ├── LoginForm.cs
+    │   ├── MenuForm.cs
+    │   ├── ProdutoForm.cs
+    │   ├── FuncionarioForm.cs
+    │   ├── FornecedorForm.cs
+    │   ├── LoteForm.cs
+    │   └── VendaForm.cs
+    ├── UIHelper.cs
+    ├── Program.cs
+    └── estoque_farmacia_winforms.csproj</pre>
+
+  <div class="placeholder">
+    <strong>[INSERIR AQUI: print da estrutura de pastas no Visual Studio ou VS Code]</strong>
+    <br><br>
+    <em>Sugestão: no VS Code, expanda <code>backend/c_sharp/estoque_farmacia</code> e
+    <code>estoque_farmacia_winforms</code> no Explorer; no Visual Studio, use o Solution Explorer
+    com a solução <code>estoque_farmacia.sln</code> aberta.</em>
+  </div>
+
+  <h2>Justificativa da separação de responsabilidades</h2>
+
+  <p><strong>Por que existe a camada Models?</strong><br>
+    Para definir <strong>o que</strong> o sistema manipula (funcionário, produto, venda), independentemente de ser
+    exibido no console, em formulário Windows ou, no futuro, em API web. Se a estrutura de um produto mudar (novo
+    campo), altera-se principalmente o model e os pontos que o utilizam, sem misturar isso com código de botão ou
+    <code>Console.WriteLine</code>.
+  </p>
+
+  <p><strong>Por que existe a camada Services?</strong><br>
+    Para concentrar <strong>regras e validações</strong> em um só lugar: CPF duplicado, fornecedor inexistente ao
+    cadastrar produto, estoque insuficiente na venda, baixa em lotes, hash de senha. A UI só pergunta dados ao
+    usuário e chama o serviço; assim, console e WinForms <strong>não repetem</strong> a mesma lógica. Isso também
+    prepara o projeto para trocar memória por banco depois — a mudança tende a ficar nos services, não em todas as
+    telas.
+  </p>
+
+  <p><strong>Por que existe a camada UI?</strong><br>
+    Porque <strong>apresentação</strong> e <strong>negócio</strong> são preocupações diferentes. O
+    <code>ProdutoUI</code> lê nome e preço no terminal; o <code>ProdutoForm</code> usa <code>TextBox</code> e
+    <code>DataGridView</code> — mas ambos chamam <code>ProdutoService.Salvar</code>. Trocar a interface (só console,
+    só WinForms, ou as duas) não obriga reescrever validação de estoque ou de fornecedor.
+  </p>
+
+  <p><strong>Fluxo resumido (dependência entre camadas):</strong></p>
+  <pre>UI (Console / WinForms)
+        ↓ chama métodos
+Services (regras + dados em memória)
+        ↓ usa objetos
+Models (entidades)</pre>
+
+  <p>
+    A UI <strong>não</strong> deve depender de detalhes internos das listas nos services; os services
+    <strong>não</strong> devem conhecer <code>MessageBox</code> ou cores do console (embora hoje alguns services
+    ainda usem <code>Console.WriteLine</code> para mensagens — ponto de melhoria futura).
+  </p>
+
+  <p>
+    <strong>Benefícios para o projeto acadêmico:</strong> código legível para a banca, divisão de tarefas entre
+    integrantes (um cuida de models/services, outro de forms/UI), alinhamento com o modelo entidade-relacional
+    documentado em <code>docs/</code> e <code>backend/database/</code>, e base para evoluções planejadas
+    (persistência, login por funcionário cadastrado, API, etc.) sem refatoração total.
+  </p>
+
+</body>
+</html>

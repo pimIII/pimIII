@@ -161,9 +161,9 @@ public class FuncionarioUI
 
             // PEDE A SENHA
             Console.Write("Senha: ");
-            string senhaHash = Console.ReadLine();
+            string senha = Console.ReadLine() ?? "";
 
-            if (string.IsNullOrWhiteSpace(senhaHash))
+            if (string.IsNullOrWhiteSpace(senha))
             {
                 Console.WriteLine("\nSenha não pode ser vazia!");
                 PauseMenu();
@@ -179,7 +179,7 @@ public class FuncionarioUI
                 Nome = nome,
                 CPF = cpf,
                 Cargo = cargo,
-                SenhaHash = senhaHash
+                SenhaHash = SenhaHasher.HashSha256(senha)
                 // Note: Id, DataAdmissao e Ativo são atribuídos pelo Service!
             };
 

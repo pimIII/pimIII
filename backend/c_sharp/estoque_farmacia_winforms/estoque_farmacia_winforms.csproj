@@ -19,6 +19,9 @@
     <Compile Include="..\estoque_farmacia\Services\ProdutoService.cs" Link="Services\ProdutoService.cs" />
     <Compile Include="..\estoque_farmacia\Services\FornecedorService.cs" Link="Services\FornecedorService.cs" />
     <Compile Include="..\estoque_farmacia\Services\LoteService.cs" Link="Services\LoteService.cs" />
+    <Compile Include="..\estoque_farmacia\Services\SenhaHasher.cs" Link="Services\SenhaHasher.cs" />
+    <Compile Include="..\estoque_farmacia\Services\Estoque.cs" Link="Services\Estoque.cs" />
+    <Compile Include="..\estoque_farmacia\Services\VendaService.cs" Link="Services\VendaService.cs" />
   </ItemGroup>
 
 </Project>

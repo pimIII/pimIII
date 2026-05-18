@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicialização da Aplicação — Program.cs — Pharmastock</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      line-height: 1.6;
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      color: #1a3a52;
+    }
+    h1 { color: #0078d7; border-bottom: 2px solid #0078d7; padding-bottom: 0.3rem; }
+    h2 { color: #0078d7; margin-top: 2rem; }
+    h3 { color: #1a3a52; margin-top: 1.5rem; }
+    pre {
+      background: #f5f8fc;
+      border: 1px solid #ddd;
+      padding: 1rem;
+      overflow-x: auto;
+      font-size: 0.85rem;
+    }
+    code { background: #f0f4f8; padding: 0.1rem 0.35rem; border-radius: 3px; }
+    .placeholder {
+      border: 2px dashed #0078d7;
+      background: #f5f8fc;
+      padding: 1.5rem;
+      text-align: center;
+      color: #555;
+      margin: 1.5rem 0;
+    }
+    .fluxo {
+      font-family: Consolas, "Courier New", monospace;
+      background: #f5f8fc;
+      border: 1px solid #ddd;
+      padding: 1rem;
+      white-space: pre-line;
+      font-size: 0.9rem;
+    }
+    ul, ol { padding-left: 1.5rem; }
+    li { margin: 0.35rem 0; }
+    figcaption { font-style: italic; color: #555; margin-top: 0.5rem; font-size: 0.95rem; }
+  </style>
+</head>
+<body>
+
+  <h1>Pharmastock — Inicialização da aplicação (<code>Program.cs</code>)</h1>
+
+  <h2>4.X Inicialização da aplicação (<code>Program.cs</code>)</h2>
+
+  <p>
+    O arquivo <strong><code>Program.cs</code></strong> é o <strong>ponto de entrada</strong> da versão em console
+    do Pharmastock. Quando o usuário executa o projeto <code>estoque_farmacia</code>, o .NET começa por esse arquivo:
+    antes de qualquer menu aparecer, o sistema precisa <strong>criar os serviços</strong> (camada de regras de negócio)
+    e <strong>conectá-los às telas em texto</strong> (camada UI). Tudo isso é feito de forma explícita nas primeiras
+    linhas do programa.
+  </p>
+
+  <h3>Montagem dos serviços</h3>
+
+  <p>Na sequência abaixo, cada serviço é instanciado respeitando as <strong>dependências</strong> entre eles:</p>
+
+  <ol>
+    <li><strong><code>FuncionarioService</code></strong> e <strong><code>FornecedorService</code></strong> — não dependem de outros serviços; são criados primeiro.</li>
+    <li><strong><code>ProdutoService(fornecedorService)</code></strong> — precisa do fornecedor para validar se o <code>IdFornecedor</code> existe ao cadastrar produto.</li>
+    <li><strong><code>LoteService(produtoService)</code></strong> — só permite lote para produto já cadastrado.</li>
+    <li><strong><code>Estoque(loteService)</code></strong> — calcula e baixa quantidade a partir dos lotes.</li>
+    <li><strong><code>VendaService(produtoService, estoque)</code></strong> — finaliza vendas checando produto e estoque.</li>
+  </ol>
+
+  <p>
+    Essa ordem evita erro de lógica (por exemplo, cadastrar produto com fornecedor inexistente ou vender sem controle
+    de lote) e mantém <strong>uma única “fonte da verdade”</strong> em memória: as listas estáticas dentro dos services
+    são compartilhadas por todas as telas abertas na mesma execução.
+  </p>
+
+  <h3>Ligação com a camada UI</h3>
+
+  <p>Em seguida, o código cria o <strong><code>Menu</code></strong> principal e injeta manualmente cada interface de usuário, já com o service correto:</p>
+
+  <ul>
+    <li><code>FuncionarioUI</code> → <code>FuncionarioService</code></li>
+    <li><code>ProdutoUI</code> → <code>ProdutoService</code></li>
+    <li><code>FornecedorUI</code> → <code>FornecedorService</code></li>
+    <li><code>LoteUI</code> → <code>LoteService</code></li>
+    <li><code>VendaUI</code> → <code>ProdutoService</code>, <code>VendaService</code> e <code>Estoque</code></li>
+  </ul>
+
+  <p>
+    Assim, quando o usuário escolhe a opção <strong>“Controle de Produto”</strong> ou <strong>“Controle de Venda”</strong>
+    no menu, a tela correspondente <strong>não cria</strong> um service novo: ela usa o mesmo objeto criado no
+    <code>Program.cs</code>, garantindo que cadastro feito em um módulo apareça nos outros (por exemplo, produto
+    cadastrado pode ser usado em lote e venda).
+  </p>
+
+  <h3>Fluxo de execução</h3>
+
+  <p>Depois da montagem, o programa:</p>
+
+  <ol>
+    <li>Chama <strong><code>menu.ValidarLogin()</code></strong> — até três tentativas com usuário/senha fixos (<code>admin</code> / <code>123</code>).</li>
+    <li>Se o login for aceito, executa <strong><code>menu.ProcessarMenu()</code></strong> — loop com as opções 1 a 5 (produto, funcionário, venda, fornecedor, lote) e saída com opção 7.</li>
+    <li>Se o login falhar, exibe mensagem e encerra.</li>
+    <li>Um bloco <strong><code>try/catch</code></strong> envolve a inicialização para capturar falhas inesperadas e exibir erro sem derrubar o processo sem aviso.</li>
+  </ol>
+
+  <div class="fluxo">Program.cs
+    → cria Services (cadeia de dependências)
+    → cria Menu + UIs (cada UI recebe seu Service)
+    → ValidarLogin()
+         ├─ ok  → ProcessarMenu() (usuário navega nos módulos)
+         └─ falha → encerra com mensagem</div>
+
+  <h3>Referência — código do <code>Program.cs</code></h3>
+
+  <pre>using estoque_farmacia.UI;
+using estoque_farmacia.Services;
+
+var funcionarioService = new FuncionarioService();
+var fornecedorService = new FornecedorService();
+var produtoService = new ProdutoService(fornecedorService);
+var loteService = new LoteService(produtoService);
+var estoque = new Estoque(loteService);
+var vendaService = new VendaService(produtoService, estoque);
+
+var menu = new Menu(
+    new FuncionarioUI(funcionarioService),
+    new ProdutoUI(produtoService),
+    new FornecedorUI(fornecedorService),
+    new LoteUI(loteService),
+    new VendaUI(produtoService, vendaService, estoque));
+
+try
+{
+    if (menu.ValidarLogin())
+        menu.ProcessarMenu();
+    else
+        Console.WriteLine("Sistema encerrado por não autorização.");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"ERRO ao inicializar aplicação: {ex.Message}");
+}</pre>
+
+  <h3>Relação com o WinForms</h3>
+
+  <p>
+    Na versão gráfica, o papel equivalente fica dividido: o <strong><code>Program.cs</code></strong> do WinForms
+    apenas inicia o <code>LoginForm</code>; a montagem dos services ocorre no <strong>construtor do
+    <code>MenuForm</code></strong>, com a mesma ideia (fornecedor → produto → lote → estoque → venda). Nos dois casos
+    trata-se de <strong>composição manual de dependências</strong>, sem container de injeção de dependência — solução
+    simples, adequada ao escopo acadêmico do projeto.
+  </p>
+
+  <h3>Figura sugerida</h3>
+
+  <div class="placeholder">
+    <strong>[INSERIR PRINT: <code>Program.cs</code> completo no Visual Studio / VS Code]</strong>
+  </div>
+
+  <figcaption>
+    Figura X – Código do <code>Program.cs</code> (aplicação console). Ilustra a criação dos serviços, a passagem
+    deles para as classes UI e o início do fluxo com validação de login e menu principal.
+  </figcaption>
+
+</body>
+</html>

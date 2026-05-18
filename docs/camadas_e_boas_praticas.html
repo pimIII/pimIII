@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camadas, Serviços e Boas Práticas — Pharmastock</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      line-height: 1.6;
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      color: #1a3a52;
+    }
+    h1 { color: #0078d7; border-bottom: 2px solid #0078d7; padding-bottom: 0.3rem; }
+    h2 { color: #0078d7; margin-top: 2.5rem; }
+    h3 { color: #1a3a52; margin-top: 1.5rem; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+    th, td { border: 1px solid #ccc; padding: 0.5rem 0.75rem; text-align: left; vertical-align: top; }
+    th { background: #f5f8fc; }
+    pre, code { font-family: Consolas, "Courier New", monospace; }
+    pre {
+      background: #f5f8fc;
+      border: 1px solid #ddd;
+      padding: 1rem;
+      overflow-x: auto;
+      font-size: 0.85rem;
+    }
+    code { background: #f0f4f8; padding: 0.1rem 0.35rem; border-radius: 3px; }
+    .placeholder {
+      border: 2px dashed #0078d7;
+      background: #f5f8fc;
+      padding: 1.5rem;
+      text-align: center;
+      color: #555;
+      margin: 1.5rem 0;
+    }
+    .nota {
+      background: #fff8e6;
+      border-left: 4px solid #f0ad4e;
+      padding: 0.75rem 1rem;
+      margin: 1rem 0;
+    }
+    ul { padding-left: 1.5rem; }
+    li { margin: 0.35rem 0; }
+    .fluxo { font-family: Consolas, monospace; background: #f5f8fc; padding: 1rem; border: 1px solid #ddd; }
+  </style>
+</head>
+<body>
+
+  <h1>Pharmastock — Detalhamento das Camadas e Boas Práticas</h1>
+
+  <!-- 4.3 -->
+  <h2>4.3 Camada de Modelos (Models)</h2>
+
+  <h3>O que são classes POCO e por que foram usadas</h3>
+  <p>
+    <strong>POCO</strong> (<em>Plain Old CLR Object</em>) é uma classe C# simples, sem herança de frameworks
+    nem dependência de banco ou interface gráfica. No Pharmastock, os models são apenas “recipientes” de dados:
+    propriedades com <code>get</code> e <code>set</code>, eventualmente um método estático de validação leve
+    (como em <code>Produto.CodigoBarrasValido</code>).
+  </p>
+  <p>Foram escolhidas porque:</p>
+  <ul>
+    <li>ficam fáceis de ler e de apresentar na documentação do PIM;</li>
+    <li>podem ser reutilizadas pelo console e pelo WinForms sem duplicar código;</li>
+    <li>no próximo semestre, a mesma estrutura pode ser mapeada para tabelas SQL ou Entity Framework sem reescrever as telas.</li>
+  </ul>
+
+  <h3>Apresentação das classes: Produto, Funcionario, Fornecedor</h3>
+  <table>
+    <thead>
+      <tr><th>Classe</th><th>Atributos principais</th><th>Tipos</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>Produto</code></td>
+        <td>Id, NomeProduto, CodigoBarras, PrecoVenda, PrecoCusto, IdFornecedor, RequerReceita</td>
+        <td><code>int</code>, <code>string</code>, <code>decimal</code>, <code>bool</code></td>
+      </tr>
+      <tr>
+        <td><code>Funcionario</code></td>
+        <td>Id, Nome, CPF, Cargo, SenhaHash, DataAdmissao, Ativo, DataDemissao</td>
+        <td><code>int</code>, <code>string</code>, <code>DateTime</code>, <code>bool</code>, <code>DateTime?</code></td>
+      </tr>
+      <tr>
+        <td><code>Fornecedor</code></td>
+        <td>Id, NomeEmpresa, Cnpj, Telefone</td>
+        <td><code>int</code>, <code>string</code></td>
+      </tr>
+    </tbody>
+  </table>
+  <p>Outras entidades no mesmo padrão: <code>Lote</code>, <code>Venda</code>, <code>ItemVenda</code>.</p>
+
+  <h3>Atributos, tipos de dados e encapsulamento com propriedades (get/set)</h3>
+  <p>
+    Cada campo do domínio é exposto como <strong>propriedade automática</strong>
+    (<code>public int Id { get; set; }</code>). Isso é o encapsulamento básico em C#: o código externo
+    lê e altera valores pelas propriedades, sem acessar variáveis internas diretamente. Tipos como
+    <code>decimal</code> são usados em preços; <code>DateTime?</code> em data de demissão permite valor nulo
+    quando o funcionário ainda está ativo.
+  </p>
+
+  <p><strong>Referência — classe <code>Produto.cs</code> completa:</strong></p>
+  <pre>using System.Globalization;
+
+namespace estoque_farmacia.Models;
+
+public class Produto
+{
+    public int Id { get; set; }
+    public string NomeProduto { get; set; }
+    public string CodigoBarras { get; set; } = string.Empty;
+    public decimal PrecoVenda { get; set; }
+    public decimal PrecoCusto { get; set; }
+    public int IdFornecedor { get; set; }
+    public bool RequerReceita { get; set; }
+
+    public static bool CodigoBarrasValido(string? codigo)
+    {
+        if (string.IsNullOrWhiteSpace(codigo))
+            return false;
+        return int.TryParse(codigo.Trim(), NumberStyles.Integer,
+            CultureInfo.InvariantCulture, out _);
+    }
+}</pre>
+
+  <div class="placeholder">
+    <strong>[INSERIR PRINT: código completo de Produto.cs no Visual Studio / VS Code]</strong>
+  </div>
+
+  <!-- 4.4 -->
+  <h2>4.4 Persistência de dados (versão atual do projeto)</h2>
+
+  <div class="nota">
+    <strong>Observação:</strong> nesta entrega o sistema <strong>não utiliza</strong> Entity Framework Core,
+    <code>AppDbContext</code> nem PostgreSQL em tempo de execução. Os scripts SQL em
+    <code>backend/database/</code> servem como modelagem de referência para evolução futura.
+  </div>
+
+  <p>
+    A persistência é feita pelos <strong>Services</strong>, que mantêm listas estáticas em memória
+    (<code>List&lt;Produto&gt;</code>, <code>List&lt;Fornecedor&gt;</code>, etc.), protegidas com
+    <code>lock</code> para evitar conflito em acessos simultâneos. Ao fechar o programa, os dados são perdidos —
+    comportamento aceitável para o protótipo acadêmico deste semestre.
+  </p>
+  <p>
+    A validação cruzada (ex.: produto só é salvo se o <code>IdFornecedor</code> existir em
+    <code>FornecedorService</code>) substitui, na prática, restrições que no banco seriam
+    <em>foreign keys</em>.
+  </p>
+
+  <div class="placeholder">
+    <strong>[Opcional: print de trecho do ProdutoService com lock e Itens.Add — “persistência” em memória]</strong><br>
+    <em>Não incluir AppDbContext — não faz parte do código atual.</em>
+  </div>
+
+  <!-- 4.5 -->
+  <h2>4.5 Camada de Serviços (Services)</h2>
+
+  <h3>Padrão de projeto: Single Responsibility + dependências no construtor</h3>
+  <p>
+    Cada Service cuida de <strong>um agregado</strong> (produtos, fornecedores, vendas…). Isso segue o
+    <strong>Single Responsibility Principle (SRP)</strong>: uma classe, uma razão principal para mudar.
+  </p>
+  <p>
+    O <code>ProdutoService</code> recebe <code>FornecedorService</code> no construtor para validar o fornecedor
+    sem duplicar a lista de fornecedores — composição simples de dependências (próximo passo seria um container
+    de DI no <code>Program.cs</code>, previsto para o próximo semestre).
+  </p>
+
+  <h3>ProdutoService — métodos CRUD</h3>
+  <table>
+    <thead>
+      <tr><th>Método</th><th>Função</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>Salvar(Produto)</code></td><td>Valida dados, verifica fornecedor e código de barras duplicado; gera Id e adiciona à lista</td></tr>
+      <tr><td><code>ListarTodos()</code></td><td>Retorna cópia da lista de produtos</td></tr>
+      <tr><td><code>BuscarPorId(int)</code></td><td>Localiza um produto pelo Id</td></tr>
+      <tr><td><code>Remover(int)</code></td><td>Remove produto da lista em memória</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Propriedade <code>UltimoErro</code></h3>
+  <p>
+    Quando uma operação falha, o service preenche <code>UltimoErro</code> com mensagem legível e retorna
+    <code>false</code>. A UI (console ou WinForms) exibe essa mensagem sem precisar capturar exceção em todo
+    botão — reduz acoplamento e mantém o fluxo previsível para o usuário.
+  </p>
+
+  <p><strong>Referência — <code>ProdutoService.cs</code> (estrutura principal):</strong></p>
+  <pre>public class ProdutoService
+{
+    private static readonly object Sync = new();
+    private static readonly List&lt;Produto&gt; Itens = new();
+    private static int _nextId = 1;
+    private readonly FornecedorService _fornecedorService;
+    public string UltimoErro { get; private set; } = string.Empty;
+
+    public ProdutoService(FornecedorService fornecedorService) { ... }
+
+    public bool Salvar(Produto novoProduto) { /* validações + Itens.Add */ }
+    public List&lt;Produto&gt; ListarTodos() { ... }
+    public Produto? BuscarPorId(int id) { ... }
+    public bool Remover(int id) { ... }
+}</pre>
+
+  <div class="placeholder">
+    <strong>[INSERIR PRINT: ProdutoService.cs completo no editor]</strong>
+  </div>
+
+  <!-- 4.6 -->
+  <h2>4.6 Implementação completa de um caso de uso — Cadastro de Produto</h2>
+
+  <h3>Justificativa da escolha</h3>
+  <p>
+    O cadastro de produto é central no domínio da farmácia: conecta <strong>fornecedor</strong> (validação cruzada),
+    alimenta <strong>lotes</strong> e <strong>vendas</strong>, e existe nas duas interfaces (console e WinForms).
+    Por isso é um bom exemplo de fluxo ponta a ponta sem ser o caso mais complexo (venda + estoque).
+  </p>
+
+  <h3>Fluxo completo</h3>
+  <div class="fluxo">
+    Usuário preenche formulário (ProdutoForm ou ProdutoUI no console)
+         ↓
+    UI monta objeto <code>Produto</code> com dados digitados
+         ↓
+    <code>ProdutoService.Salvar(produto)</code> — validações e gravação na lista em memória
+         ↓
+    Retorno <code>true</code> → mensagem de sucesso e atualização da grade/lista
+  </div>
+
+  <h3>Regra de negócio no Service, não só no botão</h3>
+  <p>
+    No WinForms, o botão <strong>Salvar</strong> faz validações <em>de interface</em> (campos vazios, formato de número).
+    Regras de negócio (fornecedor inexistente, código de barras duplicado) ficam no
+    <code>ProdutoService.Salvar</code>. O trecho final do clique resume a chamada ao service:
+  </p>
+  <pre>if (_service.Salvar(novo))
+{
+    MessageBox.Show("Produto salvo.", "Sucesso", ...);
+    LimparCampos();
+    CarregarDados();
+}
+else
+{
+    MessageBox.Show(..., _service.UltimoErro, ...);
+}</pre>
+
+  <div class="placeholder">
+    <strong>[INSERIR PRINT: evento BotaoSalvar_Click — trecho da chamada a _service.Salvar]</strong>
+  </div>
+  <div class="placeholder">
+    <strong>[INSERIR PRINT: método Salvar no ProdutoService — validações e Itens.Add]</strong>
+  </div>
+  <div class="placeholder">
+    <strong>[INSERIR PRINT: tela de cadastro de produto rodando com um produto salvo na grade]</strong>
+  </div>
+
+  <!-- 4.7 -->
+  <h2>4.7 Composição de dependências (Program.cs)</h2>
+
+  <h3>O que é injeção de dependência e o que o projeto faz hoje</h3>
+  <p>
+    <strong>Injeção de dependência (DI)</strong> significa que uma classe recebe suas colaborações prontas
+    (por construtor), em vez de criar <code>new ProdutoService()</code> dentro de cada tela. Isso reduz
+    acoplamento e facilita testes.
+  </p>
+  <p>
+    Nesta versão, a “montagem” é <strong>manual</strong> no <code>Program.cs</code> (console): instancia-se
+    <code>FornecedorService</code>, depois <code>ProdutoService(fornecedorService)</code>, depois
+    <code>LoteService</code>, <code>Estoque</code>, <code>VendaService</code>, e por fim as classes UI recebem
+    os services já configurados. No WinForms, o <code>MenuForm</code> faz o mesmo no construtor.
+  </p>
+  <p>
+    <em>Não há</em> <code>Microsoft.Extensions.DependencyInjection</code> nem container nesta entrega — evolução
+    planejada para quando houver persistência em banco.
+  </p>
+
+  <p><strong>Referência — <code>Program.cs</code>:</strong></p>
+  <pre>var fornecedorService = new FornecedorService();
+var produtoService = new ProdutoService(fornecedorService);
+var loteService = new LoteService(produtoService);
+var estoque = new Estoque(loteService);
+var vendaService = new VendaService(produtoService, estoque);
+
+var menu = new Menu(
+    new FuncionarioUI(funcionarioService),
+    new ProdutoUI(produtoService),
+    new FornecedorUI(fornecedorService),
+    new LoteUI(loteService),
+    new VendaUI(produtoService, vendaService, estoque));</pre>
+
+  <div class="placeholder">
+    <strong>[INSERIR PRINT: Program.cs com a criação dos services e do Menu]</strong>
+  </div>
+
+  <!-- 4.8 -->
+  <h2>4.8 Boas práticas de OO aplicadas</h2>
+
+  <table>
+    <thead>
+      <tr><th>Princípio / prática</th><th>Onde aparece no Pharmastock</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Encapsulamento</strong></td>
+        <td>Models com propriedades <code>get/set</code>; listas dos services são <code>private static</code>; <code>UltimoErro</code> só leitura externa (<code>get; private set</code>)</td>
+      </tr>
+      <tr>
+        <td><strong>Single Responsibility</strong></td>
+        <td><code>ProdutoService</code> só produtos; <code>FornecedorService</code> só fornecedores; telas só interação</td>
+      </tr>
+      <tr>
+        <td><strong>Separação de responsabilidades</strong></td>
+        <td>Pastas Models / Services / UI (e Forms no WinForms); regra de negócio fora do <code>MessageBox</code></td>
+      </tr>
+      <tr>
+        <td><strong>Composição</strong></td>
+        <td><code>ProdutoService</code> usa <code>FornecedorService</code>; <code>VendaService</code> usa <code>Estoque</code> e <code>ProdutoService</code></td>
+      </tr>
+      <tr>
+        <td><strong>Reuso</strong></td>
+        <td>WinForms referencia os mesmos .cs de Models/Services via <code>Link</code> no .csproj</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>O que foi evitado</h3>
+  <ul>
+    <li><strong>God Class</strong> — não há uma única classe com todos os cadastros; há UI e Service por módulo.</li>
+    <li><strong>Lógica pesada no evento do botão</strong> — validação de negócio concentrada no Service (o botão valida só entrada do usuário).</li>
+    <li><strong>UI acessando lista interna do service</strong> — a UI chama métodos públicos (<code>Salvar</code>, <code>ListarTodos</code>).</li>
+    <li><strong>Acesso direto ao banco pela UI</strong> — não há banco na versão atual; quando houver, o acesso ficará nos Services.</li>
+  </ul>
+  <p>
+    <em>Interfaces (<code>IProdutoService</code>, etc.) ainda não foram introduzidas — simplificação intencional para o 3º semestre.</em>
+  </p>
+
+  <!-- 4.9 -->
+  <h2>4.9 Evidências de execução</h2>
+  <p>Inclua capturas de tela do sistema em funcionamento e, se aplicável, do histórico do repositório.</p>
+
+  <div class="placeholder">
+    <strong>[PRINT: tela de cadastro de produto — WinForms ou console]</strong>
+  </div>
+  <div class="placeholder">
+    <strong>[PRINT: listagem de produtos após cadastro]</strong>
+  </div>
+  <div class="placeholder">
+    <strong>[PRINT: remoção de produto ou mensagem de confirmação]</strong>
+  </div>
+  <div class="placeholder">
+    <strong>[PRINT: outra tela — ex. venda, lote ou login]</strong>
+  </div>
+
+  <div class="nota">
+    <strong>Banco PostgreSQL:</strong> não se aplica a esta versão (dados em memória). Se quiser mostrar modelagem,
+    use print dos scripts em <code>backend/database/</code> ou diagrama em <code>docs/</code> — não como “dados inseridos pelo sistema”.
+  </div>
+
+  <p><strong>Repositório GitHub:</strong></p>
+  <p>
+    <a href="https://github.com/pimIII/pimIII" target="_blank" rel="noopener">https://github.com/pimIII/pimIII</a>
+    <br><em>(ajuste o link para o repositório real do grupo.)</em>
+  </p>
+  <div class="placeholder">
+    <strong>[PRINT ou link: página de commits / Insights do GitHub ao longo do desenvolvimento]</strong>
+  </div>
+
+</body>
+</html>

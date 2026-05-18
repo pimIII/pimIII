@@ -8,13 +8,15 @@ public class Menu
     private readonly ProdutoUI _produtoUI;
     private readonly FuncionarioUI _funcionarioUI;
     private readonly LoteUI _loteUI;
+    private readonly VendaUI _vendaUI;
 
-    public Menu(FuncionarioUI funcionarioUI, ProdutoUI produtoUI, FornecedorUI fornecedorUI, LoteUI loteUI)
+    public Menu(FuncionarioUI funcionarioUI, ProdutoUI produtoUI, FornecedorUI fornecedorUI, LoteUI loteUI, VendaUI vendaUI)
     {
         _funcionarioUI = funcionarioUI;
         _produtoUI = produtoUI;
         _fornecedorUI = fornecedorUI;
         _loteUI = loteUI;
+        _vendaUI = vendaUI;
     }
 
     
@@ -117,7 +119,7 @@ public class Menu
                 break;
 
                 case "3":
-                //ControledeVenda;
+                _vendaUI.ProcessarMenuVenda();
                 break;
 
                 case "4":

@@ -70,6 +70,43 @@ public class LoteService
         lock (Sync) return Itens.ToList();
     }
 
+    public decimal ObterQuantidadeDisponivel(int idProduto)
+    {
+        lock (Sync) return Itens.Where(l => l.IdProduto == idProduto).Sum(l => l.Quantidade);
+    }
+
+    public bool BaixarEstoque(int idProduto, int quantidade)
+    {
+        if (quantidade <= 0) return false;
+
+        lock (Sync)
+        {
+            var lotes = Itens.Where(l => l.IdProduto == idProduto).OrderBy(l => l.Validade).ToList();
+            decimal disponivel = lotes.Sum(l => l.Quantidade);
+            if (disponivel < quantidade) return false;
+
+            decimal restante = quantidade;
+            foreach (var lote in lotes)
+            {
+                if (restante <= 0) break;
+
+                if (lote.Quantidade >= restante)
+                {
+                    lote.Quantidade -= restante;
+                    restante = 0;
+                }
+                else
+                {
+                    restante -= lote.Quantidade;
+                    lote.Quantidade = 0;
+                }
+            }
+
+            Itens.RemoveAll(l => l.Quantidade <= 0);
+            return true;
+        }
+    }
+
     public bool Remover(int id)
     {
         try

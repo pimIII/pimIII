@@ -8,7 +8,14 @@ public class ProdutoService
     private static readonly List<Produto> Itens = new();
     private static int _nextId = 1;
 
+    private readonly FornecedorService _fornecedorService;
+
     public string UltimoErro { get; private set; } = string.Empty;
+
+    public ProdutoService(FornecedorService fornecedorService)
+    {
+        _fornecedorService = fornecedorService;
+    }
 
     public bool Salvar(Produto novoProduto)
     {
@@ -23,6 +30,18 @@ public class ProdutoService
             if (!Produto.CodigoBarrasValido(novoProduto.CodigoBarras))
             {
                 UltimoErro = "  ERRO: Codigo de barras deve ser um numero inteiro."; Console.WriteLine(UltimoErro);
+                return false;
+            }
+
+            if (novoProduto.IdFornecedor <= 0)
+            {
+                UltimoErro = "  ERRO: ID do fornecedor e obrigatorio."; Console.WriteLine(UltimoErro);
+                return false;
+            }
+
+            if (_fornecedorService.BuscarPorId(novoProduto.IdFornecedor) == null)
+            {
+                UltimoErro = "  ERRO: Fornecedor nao encontrado."; Console.WriteLine(UltimoErro);
                 return false;
             }
 

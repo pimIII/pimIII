@@ -2,15 +2,18 @@
 using estoque_farmacia.Services;
 
 var funcionarioService = new FuncionarioService();
-var produtoService = new ProdutoService();
 var fornecedorService = new FornecedorService();
+var produtoService = new ProdutoService(fornecedorService);
 var loteService = new LoteService(produtoService);
+var estoque = new Estoque(loteService);
+var vendaService = new VendaService(produtoService, estoque);
 
 var menu = new Menu(
     new FuncionarioUI(funcionarioService),
     new ProdutoUI(produtoService),
     new FornecedorUI(fornecedorService),
-    new LoteUI(loteService));
+    new LoteUI(loteService),
+    new VendaUI(produtoService, vendaService, estoque));
 
 try
 {
